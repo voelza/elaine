@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./pokemon.css" rel="stylesheet">
+    <title>Pokemons</title>
+</head>
+
+<body>
+    <div id="app">
+        <nav>
+            <button ++click="selectPokemon(null)">Home</button>
+        </nav>
+        <main>
+            <pokemon @@if="@@detailPokemon != null" pokemon="@@detailPokemon"></pokemon>
+            <div @@if="@@detailPokemon == null" class="pokemon-container">
+                <pokemon @@for="pokemon in @@pokemons" pokemon="@@pokemon" ++pokemon-selected="onPokemonSelected">
+                </pokemon>
+            </div>
+        </main>
+    </div>
+    <!-- <script src="file://C:\Users\Achim\Documents\js-workspace\kramer\dist\kramer.umd.js"></script> -->
+    <script src="./pokemon.js" type="module"></script>
+</body>
+
+</html>

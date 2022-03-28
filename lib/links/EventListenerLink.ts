@@ -12,7 +12,6 @@ export default class EventListenerSubscriber extends DefaultLink {
 
     constructor(element: Element | undefined, bindings: StateBinding[], eventName: string, callback: Function) {
         super(bindings);
-        console.log("bind");
         this.bind(this);
         this.element = element;
         this.eventName = eventName;

@@ -2,9 +2,9 @@ import StateLink from "../links/StateLink";
 import State from "./State";
 
 export default class MutableState implements State<any> {
-    _value: any;
-    subscribers: StateLink[] = [];
-    watchers: (() => void)[] = [];
+    private _value: any;
+    private subscribers: StateLink[] = [];
+    private watchers: (() => void)[] = [];
 
     constructor(value: any) {
         this._value = value;

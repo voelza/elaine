@@ -6,8 +6,8 @@ import DefaultLink from "./DefaultLink";
 
 
 export default class EventListenerSubscriber extends DefaultLink {
-    element: Element | undefined;
-    eventName: string;
+    private element: Element | undefined;
+    private eventName: string;
     listener: (event: Event | undefined) => any;
 
     constructor(element: Element | undefined, bindings: StateBinding[], eventName: string, callback: Function) {
@@ -34,7 +34,7 @@ export default class EventListenerSubscriber extends DefaultLink {
         }
     }
 
-    immediateInitNeeded(): boolean {
+    private immediateInitNeeded(): boolean {
         if (this.bindings.length === 0) {
             // init because otherwise it would never get initialized
             return true;

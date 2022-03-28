@@ -100,11 +100,11 @@ export default class Condition {
         return result;
     }
 
-    isOperator(text: string): boolean {
+    private isOperator(text: string): boolean {
         return text === "<" || text === "<=" || text === ">" || text === ">=" || text === "==" || text === "!=";
     }
 
-    parseValue(value: any): any {
+    private parseValue(value: any): any {
         if (value === "null") {
             return null;
         } else if (value === "undefined") {
@@ -113,7 +113,7 @@ export default class Condition {
         return value;
     }
 
-    evalCondition(first: any, operator: string, second: any): boolean {
+    private evalCondition(first: any, operator: string, second: any): boolean {
         let f = this.parseValue(first);
         let s = this.parseValue(second);
 

@@ -4,7 +4,7 @@ import State from "./State";
 
 
 export default class LoopState extends MutableState {
-    list: State<any>;
+    private list: State<any>;
 
     constructor(value: any, list: State<any>) {
         super(value);

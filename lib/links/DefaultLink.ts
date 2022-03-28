@@ -8,7 +8,7 @@ export default abstract class DefaultLink {
         this.bindings = bindings;
     }
 
-    bind(link: StateLink): void {
+    protected bind(link: StateLink): void {
         const uniqueBindings: StateBinding[] = this.bindings.reduce((result, binding) => {
             if (result.find(b => b.stateName === binding.stateName) === undefined) {
                 result.push(binding);

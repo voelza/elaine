@@ -7,12 +7,12 @@ import { linkEventListener } from "./EventListenerLinker";
 import StateLink from "./StateLink";
 
 export default class ModelLink implements StateLink {
-    element: Element;
-    binding: StateBinding;
-    isPathValue: boolean;
-    inputListener: (e: Event) => void;
-    targetAttribute: string;
-    eventListener: EventListenerLink | undefined;
+    private element: Element;
+    private binding: StateBinding;
+    private isPathValue: boolean;
+    private inputListener: (e: Event) => void;
+    private targetAttribute: string;
+    private eventListener: EventListenerLink | undefined;
 
     constructor(instance: Instance, element: Element, binding: StateBinding) {
         this.element = element;
@@ -25,7 +25,7 @@ export default class ModelLink implements StateLink {
         this.eventListener = this.createInputListener(instance);
     }
 
-    getInputListener(binding: StateBinding): (e: Event) => void {
+    private getInputListener(binding: StateBinding): (e: Event) => void {
         if (this.isPathValue) {
             return (e: Event) => {
                 const target: any | null = e.target;
@@ -42,7 +42,7 @@ export default class ModelLink implements StateLink {
         };
     }
 
-    createInputListener(instance: Instance): EventListenerLink | undefined {
+    private createInputListener(instance: Instance): EventListenerLink | undefined {
         const listenerName: string = this.binding.binding + "-" + uuid();
         instance.addMethod(listenerName, this.inputListener);
         return linkEventListener(instance, this.element, {

@@ -9,15 +9,15 @@ import { getValue } from "../utils/PathHelper";
 import StateLink from "./StateLink";
 
 export default class LoopLink implements StateLink {
-    id: string = uuid();
-    instance: Instance;
-    loopValueName: string;
-    binding: StateBinding;
+    private id: string = uuid();
+    private instance: Instance;
+    private loopValueName: string;
+    private binding: StateBinding;
 
-    forComment: Comment;
-    loopTemplate: Element;
-    initDone: boolean;
-    loopInstances: Instance[];
+    private forComment: Comment;
+    private loopTemplate: Element;
+    private initDone: boolean;
+    private loopInstances: Instance[];
 
     constructor(instance: Instance, element: Element, loopValueName: string, binding: StateBinding) {
         this.initDone = false;

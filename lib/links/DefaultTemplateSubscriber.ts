@@ -7,10 +7,10 @@ import StateLink from "./StateLink";
 
 
 export default abstract class DefaultTemplateLink extends DefaultLink implements StateLink {
-    template: string;
-    isConditional: boolean;
-    conditionalBindings: ConditionalStateBinding<string>[] = [];
-    valueObjectsToStrConverter: ((value: any) => string) | undefined;
+    private template: string;
+    private isConditional: boolean;
+    private conditionalBindings: ConditionalStateBinding<string>[] = [];
+    private valueObjectsToStrConverter: ((value: any) => string) | undefined;
 
     constructor(bindings: StateBinding[], template: string, valueObjectsToStrConverter: ((value: any) => string) | undefined = undefined) {
         super(bindings);
@@ -49,7 +49,7 @@ export default abstract class DefaultTemplateLink extends DefaultLink implements
 
     }
 
-    applyBindingsToTemplate(template: string): string {
+    private applyBindingsToTemplate(template: string): string {
         let updateResult: string = template;
         for (const binding of this.bindings) {
             updateResult = this.updateTemplate(updateResult, binding);
@@ -57,7 +57,7 @@ export default abstract class DefaultTemplateLink extends DefaultLink implements
         return updateResult.replaceAll(new RegExp(REACTIVE_CONCAT, "g"), "");
     }
 
-    updateTemplate(text: string, binding: StateBinding): string {
+    private updateTemplate(text: string, binding: StateBinding): string {
         let result: string = text;
         if (!binding.binding) {
             return result;
@@ -69,7 +69,7 @@ export default abstract class DefaultTemplateLink extends DefaultLink implements
         return result;
     }
 
-    valueAsString(value: any): string {
+    private valueAsString(value: any): string {
         if (value instanceof Object) {
             if (this.valueObjectsToStrConverter) {
                 return this.valueObjectsToStrConverter(value);
@@ -79,9 +79,9 @@ export default abstract class DefaultTemplateLink extends DefaultLink implements
         return value;
     }
 
-    bindingRegex(binding: string): RegExp {
+    protected bindingRegex(binding: string): RegExp {
         return ATTRIBUTE_BINDER(binding);
     }
 
-    abstract updateBinding(updateResult: string): void;
+    protected abstract updateBinding(updateResult: string): void;
 }

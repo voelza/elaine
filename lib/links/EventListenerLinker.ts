@@ -1,6 +1,5 @@
 import Instance from "../Instance";
 import FunctionImmutableState from "../states/FunctionImmutableState";
-import ImmutableState from "../states/ImmutableState";
 import State from "../states/State";
 import { StateBinding } from "../states/StateBinding";
 import { BINDING, EVENT_LISTENER_PARENT_CALL_ID } from "../Syntax";

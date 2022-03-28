@@ -3,9 +3,9 @@ import { BINDING } from "../Syntax";
 import DefaultTemplateLink from "./DefaultTemplateSubscriber";
 
 export default class AttributeLink extends DefaultTemplateLink {
-    element: Element;
-    attribute: string;
-    staticValue: string | null;
+    private element: Element;
+    private attribute: string;
+    private staticValue: string | null;
 
     constructor(element: Element, bindings: StateBinding[], attribute: string, template: string) {
         super(bindings, template, (value: any): string => {
@@ -25,7 +25,7 @@ export default class AttributeLink extends DefaultTemplateLink {
         this.staticValue = this.element.getAttribute(this.attribute);
     }
 
-    updateBinding(updateResult: string): void {
+    protected updateBinding(updateResult: string): void {
         this.element.removeAttribute(this.attribute);
         let newAttributeValue: string = "";
         if (this.staticValue !== null) {

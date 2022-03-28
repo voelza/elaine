@@ -9,12 +9,12 @@ import StateLink from "./StateLink";
 
 
 export default class Renderlink extends DefaultLink implements StateLink {
-    id: string = uuid();
-    ifComment: Comment;
-    element: Element;
-    instance: Instance;
-    condition: Condition;
-    isElementRendered: boolean | undefined;
+    private id: string = uuid();
+    private ifComment: Comment;
+    private element: Element;
+    private instance: Instance;
+    private condition: Condition;
+    private isElementRendered: boolean | undefined;
 
     constructor(element: Element, bindings: StateBinding[], condition: Condition, parent: Instance | undefined, orignalInstance: Instance | undefined = undefined) {
         super(bindings);

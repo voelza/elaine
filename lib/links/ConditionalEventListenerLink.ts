@@ -5,7 +5,7 @@ import EventListenerLink from "./EventListenerLink";
 
 
 export default class ConditionalEventListenerLink extends DefaultLink {
-    conditionalBindings: ConditionalStateBinding<EventListenerLink>[] = [];
+    private conditionalBindings: ConditionalStateBinding<EventListenerLink>[] = [];
 
     constructor(bindings: StateBinding[], conditionalBindings: ConditionalStateBinding<EventListenerLink>[]) {
         super(bindings);
@@ -23,6 +23,12 @@ export default class ConditionalEventListenerLink extends DefaultLink {
             } else {
                 binding.value.destroy();
             }
+        }
+    }
+
+    destroy(): void {
+        for (const binding of this.conditionalBindings) {
+            binding.value.destroy();
         }
     }
 };

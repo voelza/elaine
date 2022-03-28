@@ -1,4 +1,4 @@
-# COSTANZA Documentation
+# ELAINE Documentation
 
 The frontend framework formally known as KRAMER.
 

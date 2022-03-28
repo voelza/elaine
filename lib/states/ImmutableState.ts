@@ -4,8 +4,7 @@ import State from "./State";
 
 export default class ImmutableState implements State<any> {
     value: any;
-    subscribers: StateLink[] = [];
-    watchers: (() => void)[] = [];
+    private subscribers: StateLink[] = [];
 
     constructor(value: any) {
         this.value = value;

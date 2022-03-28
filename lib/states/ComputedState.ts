@@ -5,10 +5,10 @@ import State from "./State";
 export default class ComputedState<T> implements StateLink, ComputedState<T>, State<T>{
     value: T;
     computer: () => T;
-    parents: State<any>[] = [];
+    private parents: State<any>[] = [];
 
-    subscribers: StateLink[] = [];
-    watchers: (() => void)[] = [];
+    private subscribers: StateLink[] = [];
+    private watchers: (() => void)[] = [];
 
     constructor(computer: () => T, parents: State<any>[]) {
         this.computer = computer;

@@ -7,3 +7,31 @@
     margin-top: 60px;
   }
   
+
+  .modal {
+    border: 1px solid rgb(168, 164, 164);
+    border-radius: 5px;
+    padding: 5px;
+    min-width: 500px;
+  }
+  
+  .modal-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid rgb(168, 164, 164);
+    padding: 0px 5px;
+  }
+  
+  .modal-title {
+    font-family: monospace;
+  }
+  
+  .modal-close {
+    margin-left: auto;
+    cursor: pointer;
+  }
+  
+  .modal-body {
+    background-color: rgb(37, 34, 34);
+  }

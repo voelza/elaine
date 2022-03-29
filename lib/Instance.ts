@@ -36,7 +36,7 @@ export default class Instance {
     private beforeDestroyed: ((state: InstanceState) => void) | undefined;
     private onDestroyed: ((state: InstanceState) => void) | undefined;
 
-    private internalState: InstanceState;
+    internalState: InstanceState;
     private wasCreated: boolean;
     private dispatchEvent: (eventName: string, payload: any) => void;
 
@@ -79,6 +79,7 @@ export default class Instance {
             element: this.template,
             data: {},
             methods: {},
+            refs: {},
             dispatchEvent: this.dispatchEvent
         };
 
@@ -278,6 +279,12 @@ export default class Instance {
                 const componentInstance: Instance = componentByThatName.toInstance(element, this);
                 componentInstance.origin = "COMPONENT";
                 this.childInstances.push(componentInstance);
+
+                const ref = element.getAttribute("ref");
+                if (ref) {
+                    this.internalState.refs[ref] = componentInstance.internalState;
+                }
+
                 if (componentInstance.condition === undefined) {
                     componentInstance.mount();
                 }

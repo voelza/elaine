@@ -27,6 +27,7 @@ export type InstanceState = {
     element: Element,
     data: any,
     methods: any,
+    refs: any,
     dispatchEvent: (eventName: string, payload: any | undefined) => void
 };
 

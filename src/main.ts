@@ -1,5 +1,6 @@
 import './style.css'
 import Elaine from '../lib/Elaine';
+import modal from './modal';
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
@@ -86,6 +87,12 @@ const addTodo = () => {
   });
   todoTitle.value = "";
   todoContent.value = "";
+  instance.refs.modal.methods.close();
+};
+
+const openModal = () => {
+  console.log(instance);
+  instance.refs.modal.methods.open();
 };
 
 const instance = Elaine.setup(app, {
@@ -97,11 +104,10 @@ const instance = Elaine.setup(app, {
     doneTodos,
     todoTitle,
     todoContent,
-    addTodo
+    addTodo,
+    openModal
   },
   components: [
-    todo, yo
+    todo, yo, modal
   ]
 });
-
-console.log(instance);

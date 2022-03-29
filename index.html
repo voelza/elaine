@@ -10,15 +10,25 @@
 <body> <a href="./src/examples/pokemon/pokemon.html">Pokemon Example</a>
 
   <div id="app">
-    <h1 @@if="@@myState.visible" ++click="alertMyState">@@{myState.text}</h1>
+    <h1 @@if="@@myState.visible" ++click="alertMyState" @@style="color: @@myState.color;">@@{myState.text}</h1>
     <yo @@if="@@myState.visible"></yo>
     <input type="text" @@model="myState.text" />
     <input type="checkbox" @@model="myState.visible" />
+    <input type="color" @@model="myState.color" />
     <hr />
     <h1>TODOs</h1>
-    <input type="text" @@model="todoTitle" />
-    <input type="text" @@model="todoContent" />
-    <button ++click="addTodo">Add Todo</button>
+
+    <button ++click="openModal">Add Todo</button>
+
+    <modal ref="modal" title="Add a new tab!">
+      <content>
+        <div class="add-todo-form">
+          <input @@model="@@todoTitle" type="text" placeholder="ToDo title" />
+          <textarea @@model="@@todoContent" placeholder="ToDo content" rows="5"></textarea>
+          <button ++click="addTodo">Add Todo</button>
+        </div>
+      </content>
+    </modal>
     <div style="display: flex; flex-direction: row; gap: 15px; justify-content: center;">
       <div>
         <todo @@for="todo in @@openTodos" todo="@@todo"></todo>

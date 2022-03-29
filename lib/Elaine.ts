@@ -1,6 +1,6 @@
 import Component from "./Component";
 import Instance from "./Instance";
-import { ComponentData, SetupState } from "./PublicTypes";
+import { ComponentData, InstanceState, SetupState } from "./PublicTypes";
 import ComputedState from "./states/ComputedState";
 import MutableState from "./states/MutableState";
 import State from "./states/State";
@@ -51,7 +51,7 @@ Object.defineProperty(Object.prototype, "getValueForKeyPath", {
 });
 
 
-function setup(element: Element, setupState: SetupState | undefined): Instance {
+function setup(element: Element, setupState: SetupState | undefined): InstanceState {
     const instance = new Instance(
         element,
         element,
@@ -70,7 +70,8 @@ function setup(element: Element, setupState: SetupState | undefined): Instance {
     );
     instance.origin = "SETUP";
     instance.mount();
-    return instance;
+    console.log(instance);
+    return instance.internalState;
 };
 
 function state<T>(value: T): State<T> {

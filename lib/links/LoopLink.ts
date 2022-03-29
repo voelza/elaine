@@ -1,5 +1,5 @@
 
-import Instance from "../Instance";
+import Instance, { Origin } from "../Instance";
 import LoopState from "../states/LoopState";
 import { StateBinding } from "../states/StateBinding";
 import uuid from "../states/uuid";
@@ -71,8 +71,7 @@ export default class LoopLink implements StateLink {
         }
         for (let i = list.length - 1; i >= 0; i--) {
             const loopValue: any = list[i];
-            const loopInstance: Instance = new Instance(this.loopTemplate, this.loopTemplate, this.instance);
-            loopInstance.origin = "LOOP";
+            const loopInstance: Instance = new Instance(Origin.LOOP, this.loopTemplate, this.loopTemplate, this.instance);
             loopInstance.merge(this.instance);
             loopInstance.addState(this.loopValueName, new LoopState(loopValue, this.binding.state!));
             loopInstance.appendMount(this.forComment);

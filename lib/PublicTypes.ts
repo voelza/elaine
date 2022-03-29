@@ -21,6 +21,7 @@ export type ComponentData = {
     onUnmounted?: (state: InstanceState) => void;
     beforeDestroyed?: (state: InstanceState) => void;
     onDestroyed?: (state: InstanceState) => void;
+    css?: string | undefined;
 };
 
 export type InstanceState = {

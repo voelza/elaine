@@ -32,12 +32,22 @@ const todo = Elaine.component({
   props: ["todo"],
   template: `
   <div>
-      <h2>@@{todo.title}</h2>
-      <button ++click="toggleTodoDone">@@{{@@todo.done : Undone;!@@todo.done: Done}}</button>
+      <div class="todo-header">
+        <h2>@@{todo.title}</h2>
+        <button ++click="toggleTodoDone">@@{{@@todo.done : Undone;!@@todo.done: Done}}</button>
+      </div>
       <div ++click="alertTodo(@@todo)">
         @@{todo.content}
       </div>
     </div>
+    `,
+  css: `
+    .todo-header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 15px;
+    }
     `,
   setup(state) {
     const todo = state.data.todo;
@@ -61,12 +71,14 @@ const todo = Elaine.component({
 const yo = Elaine.component({
   name: "yo",
   template: `
-  <div>yoy oy yo
-    </div>
+  <div>yoy oy yo</div>
     `,
   setup: () => {
     console.log("yo setup");
-  }
+  },
+  css: `div {
+    font-size: 25px;
+  }`
 });
 
 const alertMyState = () => {
@@ -91,7 +103,6 @@ const addTodo = () => {
 };
 
 const openModal = () => {
-  console.log(instance);
   instance.refs.modal.methods.open();
 };
 

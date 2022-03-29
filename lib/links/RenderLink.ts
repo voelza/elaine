@@ -1,5 +1,5 @@
 import Condition from "../Condition";
-import Instance from "../Instance";
+import Instance, { Origin } from "../Instance";
 import { StateBinding } from "../states/StateBinding";
 import uuid from "../states/uuid";
 import { BINDING } from "../Syntax";
@@ -27,7 +27,7 @@ export default class Renderlink extends DefaultLink implements StateLink {
         this.element = element;
         this.element.removeAttribute(BINDING + "if");
 
-        this.instance = orignalInstance ?? new Instance(this.element, this.element).merge(parent);
+        this.instance = orignalInstance ?? new Instance(Origin.LOOP, this.element, this.element).merge(parent);
         this.element.remove();
     }
 

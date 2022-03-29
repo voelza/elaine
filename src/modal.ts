@@ -15,6 +15,38 @@ export default Elaine.component({
         </div>
     </div>
     `,
+    css: `
+        .modal {
+            border: 1px solid rgb(168, 164, 164);
+            border-radius: 5px;
+            padding: 5px;
+            min-width: 500px;
+            background-color: lightgray;
+        }
+        
+        .modal-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            border-bottom: 1px solid rgb(168, 164, 164);
+            padding: 0px 5px;
+        }
+        
+        .modal-title {
+            font-family: monospace;
+        }
+        
+        .modal-close {
+            margin-left: auto;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+    `,
     props: ["title"],
     slots: ["content", "header"],
     setup: (state: InstanceState) => {
@@ -28,13 +60,11 @@ export default Elaine.component({
             modal.parentNode?.removeChild(modal);
             if (backdrop.parentNode)
                 backdrop.parentNode.removeChild(backdrop);
-            console.log("close");
         };
 
         const open = () => {
             document.body.appendChild(backdrop);
             document.body.appendChild(modal);
-            console.log("open");
         };
 
         backdrop.addEventListener("click", close);

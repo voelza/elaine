@@ -13,8 +13,15 @@ import { StateBinding } from "./states/StateBinding";
 import { retrieveBindings } from "./utils/RegexMatcher";
 import RenderLink from "./links/RenderLink";
 
+export enum Origin {
+    SETUP,
+    COMPONENT,
+    IF,
+    LOOP
+}
+
 export default class Instance {
-    origin: string | undefined;
+    private origin: Origin;
     private element: Element;
     private parent: Instance | undefined = undefined;
     private template: Element;
@@ -40,7 +47,10 @@ export default class Instance {
     private wasCreated: boolean;
     private dispatchEvent: (eventName: string, payload: any) => void;
 
+    private styleElement: Element | undefined;
+
     constructor(
+        origin: Origin,
         element: Element,
         template: Element,
         parent: Instance | undefined = undefined,
@@ -53,6 +63,7 @@ export default class Instance {
         beforeDestroyed: ((state: InstanceState) => void) | undefined = undefined,
         onDestroyed: ((state: InstanceState) => void) | undefined = undefined,
         components: Component[] | undefined = undefined) {
+        this.origin = origin;
         this.element = element;
         this.template = template.cloneNode(true) as Element;
         this.parent = parent;
@@ -88,6 +99,18 @@ export default class Instance {
             this.conditionLink = new RenderLink(element, this.condition.getBindings(), this.condition, undefined, this);
             this.conditionLink.init();
         }
+
+        if (this.origin === Origin.SETUP) {
+            const css = Array.from(this.components.values())
+                .map(c => c.css)
+                .filter(c => c !== undefined)
+                .reduce((cssAll, css) => cssAll + " " + css, "");
+            if (css) {
+                this.styleElement = document.createElement("style");
+                this.styleElement.textContent = css;
+            }
+        }
+
         this.wasCreated = false;
     }
 
@@ -171,7 +194,11 @@ export default class Instance {
             // do not mount or setup
             return;
         }
+
         insertAfter(this.template, this.element);
+        if (this.styleElement) {
+            insertAfter(this.styleElement, this.element);
+        }
         this.setupIfNeeded();
 
         this.element.remove();
@@ -188,6 +215,9 @@ export default class Instance {
             return;
         }
         insertAfter(this.template, comment);
+        if (this.styleElement) {
+            insertAfter(this.styleElement, comment);
+        }
         this.setupIfNeeded();
 
 
@@ -277,7 +307,6 @@ export default class Instance {
             const componentByThatName: Component | undefined = this.getComponent(element.tagName);
             if (componentByThatName !== undefined) {
                 const componentInstance: Instance = componentByThatName.toInstance(element, this);
-                componentInstance.origin = "COMPONENT";
                 this.childInstances.push(componentInstance);
 
                 const ref = element.getAttribute("ref");
@@ -304,6 +333,7 @@ export default class Instance {
         }
 
         this.template.remove();
+        this.styleElement?.remove();
         for (const instance of this.childInstances) {
             instance.unmount();
         }

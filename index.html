@@ -22,11 +22,10 @@
 
     <modal ref="modal" title="Add a new tab!">
       <content>
-        <div class="add-todo-form">
-          <input @@model="@@todoTitle" type="text" placeholder="ToDo title" />
-          <textarea @@model="@@todoContent" placeholder="ToDo content" rows="5"></textarea>
-          <button ++click="addTodo">Add Todo</button>
-        </div>
+        <h2>@@{title}</h2>
+        <input @@model="@@todoTitle" type="text" placeholder="ToDo title" />
+        <textarea @@model="@@todoContent" placeholder="ToDo content" rows="5"></textarea>
+        <button ++click="addTodo">Add Todo</button>
       </content>
     </modal>
     <div style="display: flex; flex-direction: row; gap: 15px; justify-content: center;">

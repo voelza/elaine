@@ -111,9 +111,7 @@ const openModal = () => {
   instance.refs.modal.methods.open();
 };
 
-const addTodoNotPossible = Elaine.computed(() => {
-  return !todoTitle.value || !todoContent.value ? "disable" : "";
-}, todoTitle, todoContent);
+const addTodoNotPossible = Elaine.computed(() => !todoTitle.value || !todoContent.value, todoTitle, todoContent);
 
 const instance = Elaine.setup(app, {
   state: {

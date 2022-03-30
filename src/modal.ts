@@ -54,7 +54,7 @@ export default Elaine.component({
         modal.setAttribute("style", "position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000;");
 
         const backdrop = document.createElement("div");
-        backdrop.setAttribute("style", "position: fixed; left: 0; top: 0; z-index: 999; width: 100vw; height: 100vw; background-color: #80808075;");
+        backdrop.setAttribute("style", "position: fixed; left: 0; top: 0; z-index: 999; width: 100vw; height: 100vw; background-color: #80808095;");
 
         const close = () => {
             modal.parentNode?.removeChild(modal);

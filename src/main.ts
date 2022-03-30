@@ -34,7 +34,7 @@ const todo = Elaine.component({
   <div>
       <div class="todo-header">
         <h2>@@{todo.title}</h2>
-        <button ++click="toggleTodoDone">@@{{@@todo.done : Undone;!@@todo.done: Done}}</button>
+        <button ++click="{@@todo.done : undone(); !@@todo.done : done()}">@@{{@@todo.done : Undone;!@@todo.done: Done}}</button>
       </div>
       <div ++click="alertTodo(@@todo)">
         @@{todo.content}
@@ -51,8 +51,12 @@ const todo = Elaine.component({
     `,
   setup(state) {
     const todo = state.data.todo;
-    const toggleTodoDone = () => {
-      todo.value.done = !todo.value.done;
+    const done = () => {
+      todo.value.done = true;
+    }
+
+    const undone = () => {
+      todo.value.done = false;
     }
 
     const alertTodo = (todo: any) => {
@@ -61,7 +65,8 @@ const todo = Elaine.component({
     }
     return {
       state: {
-        toggleTodoDone,
+        done,
+        undone,
         alertTodo
       }
     }
@@ -106,6 +111,10 @@ const openModal = () => {
   instance.refs.modal.methods.open();
 };
 
+const addTodoNotPossible = Elaine.computed(() => {
+  return !todoTitle.value || !todoContent.value ? "disable" : "";
+}, todoTitle, todoContent);
+
 const instance = Elaine.setup(app, {
   state: {
     myState,
@@ -116,7 +125,8 @@ const instance = Elaine.setup(app, {
     todoTitle,
     todoContent,
     addTodo,
-    openModal
+    openModal,
+    addTodoNotPossible
   },
   components: [
     todo, yo, modal

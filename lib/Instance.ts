@@ -199,9 +199,9 @@ export default class Instance {
         if (this.styleElement) {
             insertAfter(this.styleElement, this.element);
         }
+        this.element.remove();
         this.setupIfNeeded();
 
-        this.element.remove();
 
         // was mounted
         if (this.onMounted) {

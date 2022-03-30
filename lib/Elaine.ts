@@ -87,7 +87,7 @@ function watch(watcher: () => void, ...states: State<any>[]): void {
 function computed<T>(computer: () => T, ...states: State<any>[]): ComputedState<T> {
     const computedValue: ComputedState<T> = new ComputedState(computer, states);
     for (const state of states) {
-        state.subscribe(computedValue);
+        state?.subscribe(computedValue);
     }
     return computedValue;
 }

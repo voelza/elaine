@@ -7,7 +7,9 @@
   <title>ELAINE Test</title>
 </head>
 
-<body> <a href="./src/examples/pokemon/pokemon.html">Pokemon Example</a>
+<body>
+  <a href="./src/examples/pokemon/pokemon.html">Pokemon Example</a>
+  <a href="./src/examples/table/table.html">Table Example</a>
 
   <div id="app">
     <h1 @@if="@@myState.visible" ++click="alertMyState" @@style="color: @@myState.color;">@@{myState.text}</h1>
@@ -25,7 +27,7 @@
         <h2>@@{title}</h2>
         <input @@model="@@todoTitle" type="text" placeholder="ToDo title" />
         <textarea @@model="@@todoContent" placeholder="ToDo content" rows="5"></textarea>
-        <button ++click="addTodo">Add Todo</button>
+        <button ++click="addTodo" @@disabled="@@addTodoNotPossible">Add Todo</button>
       </content>
     </modal>
     <div style="display: flex; flex-direction: row; gap: 15px; justify-content: center;">

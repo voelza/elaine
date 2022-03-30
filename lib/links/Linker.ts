@@ -100,23 +100,16 @@ function linkLoop(instance: Instance, element: Element, attribute: Attribute): v
     }
     const matches: Match[] = loopPatternMatches[0].matches;
     const loopValueName = matches.find(m => m.group === 1)?.value.trim();
-    const listValueName = matches.find(m => m.group === 2)?.value.trim().substring(BINDING.length);
+    const listValueName = matches.find(m => m.group === 2)?.value.trim();
     if (!loopValueName || !listValueName) {
         return;
     }
 
-    const stateName: string = getBindingNameFromKeyPath(listValueName);
-    const stateSubPath: string = getValuePath(listValueName);
-    const state: State<any> | undefined = instance.getState(stateName);
-    if (state) {
-        const binding: StateBinding = {
-            binding: listValueName,
-            stateName: stateName,
-            stateSubPath: stateSubPath,
-            state: state
-        };
+    const bindings = retrieveBindings(instance, ATTRIBUTE_ELEMENT_STATE_BINDING, listValueName);
+    if (bindings.length === 1) {
+        const binding: StateBinding = bindings[0];
         const loopLink: LoopLink = new LoopLink(instance, element, loopValueName, binding);
-        state.subscribe(loopLink);
+        binding.state?.subscribe(loopLink);
         instance.addLink(loopLink);
     }
 }

@@ -259,7 +259,7 @@ export default class Instance {
             if (propAttr) {
                 const stateName = propAttr.substring(BINDING.length);
                 const state: State<any> | undefined = parent?.getState(stateName);
-                if (state && state instanceof MutableState) {
+                if (state && state instanceof MutableState || state instanceof ImmutableState || state instanceof ComputedState) {
                     this.states.set(propName, state);
                     this.internalState.data[propName] = state;
                 } else if (propAttr) {
@@ -290,7 +290,7 @@ export default class Instance {
                 if (state instanceof Function) {
                     this.methods.set(propName, state);
                     this.internalState.methods[propName] = state;
-                } else if (state instanceof MutableState || state instanceof ComputedState) {
+                } else if (state instanceof MutableState || state instanceof ComputedState || state instanceof ImmutableState) {
                     this.states.set(propName, state);
                     this.internalState.data[propName] = state;
                 } else {

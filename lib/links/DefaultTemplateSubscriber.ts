@@ -66,6 +66,8 @@ export default abstract class DefaultTemplateLink extends DefaultLink implements
         const reactiveValue = binding.state?.value;
         const value = getValue(binding.binding, reactiveValue);
         result = result.replaceAll(bindingRegex, this.valueAsString(value));
+
+        console.log(bindingRegex, reactiveValue);
         return result;
     }
 

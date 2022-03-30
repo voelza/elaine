@@ -3,13 +3,18 @@ export function getValue(keyPath: string, value: any): any {
         return value;
     }
 
-    let val = value;
-    let dotIndex: number = keyPath.indexOf(".");
-    if (dotIndex !== -1) {
-        keyPath = keyPath.substring(dotIndex + 1);
-        val = val.getValueForKeyPath(keyPath);
+    if (value instanceof Object) {
+        let val = value;
+        let dotIndex: number = keyPath.indexOf(".");
+        if (dotIndex !== -1) {
+            keyPath = keyPath.substring(dotIndex + 1);
+            val = val.getValueForKeyPath(keyPath);
+        }
+        return val;
+    } else {
+        return value;
     }
-    return val;
+
 };
 
 export function getBindingNameFromKeyPath(keyPath: string): string {

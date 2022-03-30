@@ -13,46 +13,39 @@ const table = ELAINE.component({
         </thead>
         <tbody>
         <tr @@for="row in @@rows">
-            <td @@for="attr in @@attributes(@@row)">
-                @@{getAttribute(@@attr, @@row)}
+            <td @@for="header in @@headers">
+                 @@{getAttribute(@@header.key, @@row)}
             </td>
         </tr>
         </tbody>
     </table>
     `,
     css: `
+        td, th {
+            border: 1px solid black;
+            padding: 5px;
+        }
+
         th {
             text-transform: capitalize;
         }
     `,
-    props: ["items"],
+    props: ["items", "headers"],
     setup: (state) => {
         const items = state.data.items;
-        const headers = ELAINE.computed(() => {
-            if (!items.value || items.value.length === 0) {
-                return [];
-            }
-            return Array.from(Object.keys(items.value[0])).map(header => {
-                return {
-                    label: header
-                }
-            });
-        }, items);
-        const rows = ELAINE.computed(() => items.value, items);
+        const rows = ELAINE.computed(() => items ? items.value : [], items);
 
-        const attributes = (row: any) => Object.keys(row);
         const getAttribute = (attribute: string, row: any) => {
             const data = row[attribute];
-            if (row[attribute] instanceof Date) {
+            if (data instanceof Date) {
                 return (data as Date).toLocaleDateString();
             }
             return data;
         };
+
         return {
             state: {
-                headers,
                 rows,
-                attributes,
                 getAttribute
             }
         }
@@ -85,7 +78,21 @@ const content = [
 
 ELAINE.setup(document.getElementById("app")!, {
     state: {
-        content
+        content,
+        headers: [
+            {
+                label: "My Cool Name",
+                key: "name"
+            },
+            {
+                label: "age",
+                key: "age"
+            },
+            {
+                label: "birthday",
+                key: "birthdate"
+            }
+        ]
     },
     components: [table]
 });

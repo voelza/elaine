@@ -244,7 +244,7 @@ export default class Instance {
             if (slotTemplateOnElement && slotTemplateOnElement.parentNode) {
                 slotTemplateOnElement.remove();
 
-                const children: Element[] = Array.from(slotTemplateOnElement.children);
+                const children: Node[] = Array.from(slotTemplateOnElement.childNodes);
                 for (const child of children) {
                     slotOnThisComponent?.parentNode?.insertBefore(child, slotOnThisComponent);
                 }

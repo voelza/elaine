@@ -9,7 +9,25 @@
 
 <body>
     <div id="app">
-        <myTable items="@@content" headers="@@headers"></myTable>
+        <div style="display: flex; flex-direction: column; width: 200px;">
+            <input @@model="newRow.name" type="text" />
+            <input @@model="newRow.age" type="number" min="1" />
+            <input @@model="newRow.birthdate" type="date" />
+            <button ++click="addNewRow">Add</button>
+        </div>
+        <br />
+        <myTable items="@@content" headers="@@headers">
+            <column>
+                <div>
+                    <div>Data: @@{data}</div>
+                    <div>One: @@{one}</div>
+                    <div>Key: @@{key}</div>
+                    <div>Label: @@{label}</div>
+                    <div>Header: @@{header}</div>
+                    <div>Row: @@{row}</div>
+                </div>
+            </column>
+        </myTable>
     </div>
     <script src="./table.ts" type="module"></script>
 </body>

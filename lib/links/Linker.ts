@@ -1,5 +1,5 @@
 import Instance from "../Instance";
-import { Match, MatchRequest, regexMatches, regexMatchesGroups, retrieveBindings } from "../utils/RegexMatcher";
+import { createTemplateStates, Match, MatchRequest, regexMatches, regexMatchesGroups, retrieveBindings } from "../utils/RegexMatcher";
 import { StateBinding } from "../states/StateBinding";
 import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING, EVENT_LISTENER_BINDING, EVENT_LISTENER_PARENT_CALL_ID, LOOP_BINDING, TEXT_CONDITIONAL_STATE_BINDING, TEXT_STATE_BINDING } from "../Syntax";
 import TextLink from "./TextLink";
@@ -17,8 +17,14 @@ export type Attribute = {
     value: string;
 };
 
+
 export function link(instance: Instance, element: Element, parent: Instance | undefined = undefined): void {
     if (element.tagName === "SCRIPT" || element instanceof Comment) {
+        return;
+    }
+
+    if ("TEMPLATE-STATE" === element.tagName) {
+        addStateFromTemplate(instance, element);
         return;
     }
 
@@ -155,4 +161,12 @@ function linkAttribute(instance: Instance, element: Element, attribute: Attribut
     if (bindings.length !== 0) {
         instance.addLink(new AttributeLink(element, bindings, attributeName, template));
     }
+}
+
+function addStateFromTemplate(instance: Instance, element: Element) {
+    for (const attribute of Array.from(element.attributes)) {
+        instance.addState(attribute.name, createTemplateStates(instance, attribute.value));
+        console.log(instance);
+    }
+    element.remove();
 }

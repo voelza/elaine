@@ -14,7 +14,13 @@ const table = ELAINE.component({
         <tbody>
         <tr @@for="row in @@rows">
             <td @@for="header in @@headers">
-                 @@{getAttribute(@@header.key, @@row)}
+                 <template-state 
+                    data="getAttribute(@@header.key, @@row)" 
+                    key="@@header.key" 
+                    label="@@header.label" 
+                    one="@@1"
+                    ></template-state>
+                 <column></column>
             </td>
         </tr>
         </tbody>
@@ -31,11 +37,16 @@ const table = ELAINE.component({
         }
     `,
     props: ["items", "headers"],
+    slots: ["column"],
     setup: (state) => {
         const items = state.data.items;
         const rows = ELAINE.computed(() => items ? items.value : [], items);
 
         const getAttribute = (attribute: string, row: any) => {
+            if (!row) {
+                return;
+            }
+
             const data = row[attribute];
             if (data instanceof Date) {
                 return (data as Date).toLocaleDateString();
@@ -52,7 +63,7 @@ const table = ELAINE.component({
     }
 });
 
-const content = [
+const content = ELAINE.state([
     {
         name: "Achim",
         age: 30,
@@ -73,8 +84,25 @@ const content = [
         age: 30,
         birthdate: new Date("1991-12-09")
     },
-];
+]);
 
+const newRow = ELAINE.state({
+    name: "",
+    age: 1,
+    birthdate: ""
+});
+
+const addNewRow = () => {
+    content.value.push({
+        name: newRow.value.name,
+        age: newRow.value.age,
+        birthdate: new Date(newRow.value.birthdate)
+    });
+
+    newRow.value.name = "";
+    newRow.value.age = 1;
+    newRow.value.birthdate = "";
+}
 
 ELAINE.setup(document.getElementById("app")!, {
     state: {
@@ -92,7 +120,9 @@ ELAINE.setup(document.getElementById("app")!, {
                 label: "birthday",
                 key: "birthdate"
             }
-        ]
+        ],
+        newRow,
+        addNewRow
     },
     components: [table]
 });

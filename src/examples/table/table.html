@@ -16,15 +16,16 @@
             <button ++click="addNewRow">Add</button>
         </div>
         <br />
-        <myTable items="@@content" headers="@@headers">
+        <myTable items="@@content" headers="@@headers" withRowNum="false">
             <column>
-                <div>
-                    <div>Data: @@{data}</div>
-                    <div>One: @@{one}</div>
-                    <div>Key: @@{key}</div>
-                    <div>Label: @@{label}</div>
-                    <div>Header: @@{header}</div>
-                    <div>Row: @@{row}</div>
+                <div @@if="@@key == name">
+                    @@{data.firstname} @@{data.lastname}
+                </div>
+                <div @@if="@@key == age">
+                    @@{data}
+                </div>
+                <div @@if="@@key == birthdate">
+                    @@{data}
                 </div>
             </column>
         </myTable>

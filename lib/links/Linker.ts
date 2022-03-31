@@ -166,7 +166,6 @@ function linkAttribute(instance: Instance, element: Element, attribute: Attribut
 function addStateFromTemplate(instance: Instance, element: Element) {
     for (const attribute of Array.from(element.attributes)) {
         instance.addState(attribute.name, createTemplateStates(instance, attribute.value));
-        console.log(instance);
     }
     element.remove();
 }

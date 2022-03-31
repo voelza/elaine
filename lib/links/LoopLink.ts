@@ -1,5 +1,6 @@
 
 import Instance, { Origin } from "../Instance";
+import ImmutableState from "../states/ImmutableState";
 import LoopState from "../states/LoopState";
 import { StateBinding } from "../states/StateBinding";
 import uuid from "../states/uuid";
@@ -74,6 +75,8 @@ export default class LoopLink implements StateLink {
             const loopInstance: Instance = new Instance(Origin.LOOP, this.loopTemplate, this.loopTemplate, this.instance);
             loopInstance.merge(this.instance);
             loopInstance.addState(this.loopValueName, new LoopState(loopValue, this.binding.state!));
+            loopInstance.addState("_index", new ImmutableState(i));
+            console.log(loopInstance);
             loopInstance.appendMount(this.forComment);
             this.loopInstances.push(loopInstance);
         }

@@ -6,6 +6,9 @@ const table = ELAINE.component({
     <table>
         <thead>
             <tr>
+                <th @@if="@@withRowNum">
+                    N#
+                </th>
                <th @@for="header in @@headers">
                     @@{header.label}
                </th>
@@ -13,12 +16,14 @@ const table = ELAINE.component({
         </thead>
         <tbody>
         <tr @@for="row in @@rows">
+            <td @@if="@@withRowNum">
+                @@{_index}
+            </td>
             <td @@for="header in @@headers">
                  <template-state 
                     data="getAttribute(@@header.key, @@row)" 
                     key="@@header.key" 
-                    label="@@header.label" 
-                    one="@@1"
+                    label="@@header.label"
                     ></template-state>
                  <column></column>
             </td>
@@ -27,8 +32,12 @@ const table = ELAINE.component({
     </table>
     `,
     css: `
+        table {
+            border-collapse: collapse;
+        }
+
         td, th {
-            border: 1px solid black;
+            border-bottom: 1px solid lightgray;
             padding: 5px;
         }
 
@@ -36,7 +45,7 @@ const table = ELAINE.component({
             text-transform: capitalize;
         }
     `,
-    props: ["items", "headers"],
+    props: ["items", "headers", "withRowNum"],
     slots: ["column"],
     setup: (state) => {
         const items = state.data.items;
@@ -65,22 +74,34 @@ const table = ELAINE.component({
 
 const content = ELAINE.state([
     {
-        name: "Achim",
+        name: {
+            firstname: "Achim",
+            lastname: "Yo"
+        },
         age: 30,
         birthdate: new Date("1991-12-09")
     },
     {
-        name: "Achim",
+        name: {
+            firstname: "Achim",
+            lastname: "Yo1"
+        },
         age: 30,
         birthdate: new Date("1991-12-09")
     },
     {
-        name: "Achim",
+        name: {
+            firstname: "Achim",
+            lastname: "Yo2"
+        },
         age: 30,
         birthdate: new Date("1991-12-09")
     },
     {
-        name: "Achim",
+        name: {
+            firstname: "Achim",
+            lastname: "Yo3"
+        },
         age: 30,
         birthdate: new Date("1991-12-09")
     },
@@ -94,7 +115,10 @@ const newRow = ELAINE.state({
 
 const addNewRow = () => {
     content.value.push({
-        name: newRow.value.name,
+        name: {
+            firstname: newRow.value.name,
+            lastname: ""
+        },
         age: newRow.value.age,
         birthdate: new Date(newRow.value.birthdate)
     });
@@ -104,25 +128,36 @@ const addNewRow = () => {
     newRow.value.birthdate = "";
 }
 
+
+const headers = ELAINE.state([
+    {
+        label: "My Cool Name",
+        key: "name"
+    },
+    {
+        label: "age",
+        key: "age"
+    },
+    {
+        label: "birthday",
+        key: "birthdate"
+    }
+]);
+
+const getFirstName = (name: any) => {
+    return name.firstname;
+}
+
+const constant = 1;
+
 ELAINE.setup(document.getElementById("app")!, {
     state: {
         content,
-        headers: [
-            {
-                label: "My Cool Name",
-                key: "name"
-            },
-            {
-                label: "age",
-                key: "age"
-            },
-            {
-                label: "birthday",
-                key: "birthdate"
-            }
-        ],
+        headers,
         newRow,
-        addNewRow
+        addNewRow,
+        getFirstName,
+        constant
     },
     components: [table]
 });

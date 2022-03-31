@@ -20,6 +20,9 @@
     <hr />
     <h1>TODOs</h1>
 
+    <div class="all-todos">
+      <div @@for="todo in @@todos" class="todo-bubble">@@{_index} @@{todo.title}</div>
+    </div>
     <button ++click="openModal">Add Todo</button>
 
     <modal ref="modal" title="Add a new tab!">

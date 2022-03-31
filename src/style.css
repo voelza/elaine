@@ -1,12 +1,26 @@
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-  }
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
 
-  .todo-header {
-    flex-direction: column;
-  }
+.todo-header {
+  flex-direction: column;
+}
+
+.all-todos {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.todo-bubble {
+  padding: 5px;
+  background-color: aliceblue;
+  border-radius: 5px;
+}

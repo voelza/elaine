@@ -56,7 +56,10 @@ const pokemon = ELAINE.component({
     <img @@if="@@loading" src="./loading.gif" class="loading" />
 </div>
     `,
-    props: ["pokemon"],
+    props: [{
+        name: "pokemon",
+        type: Object
+    }],
     setup: fetchPokemonData
 });
 

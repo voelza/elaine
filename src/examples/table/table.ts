@@ -45,7 +45,21 @@ const table = ELAINE.component({
             text-transform: capitalize;
         }
     `,
-    props: ["items", "headers", "withRowNum"],
+    props: [
+        {
+            name: "items",
+            type: Array
+        },
+        {
+            name: "headers",
+            type: Array
+        },
+        {
+            name: "withRowNum",
+            required: false,
+            default: false,
+            type: Boolean
+        }],
     slots: ["column"],
     setup: (state) => {
         const items = state.data.items;

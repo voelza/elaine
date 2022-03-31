@@ -29,7 +29,10 @@ const todos = Elaine.state([
 
 const todo = Elaine.component({
   name: "todo",
-  props: ["todo"],
+  props: [{
+    name: "todo",
+    type: Object
+  }],
   template: `
   <div>
       <div class="todo-header">

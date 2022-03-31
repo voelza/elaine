@@ -16,7 +16,7 @@
             <button ++click="addNewRow">Add</button>
         </div>
         <br />
-        <myTable items="@@content" headers="@@headers" withRowNum="false">
+        <myTable items="@@content" headers="@@headers" withRowNum="true">
             <column>
                 <div @@if="@@key == name">
                     @@{data.firstname} @@{data.lastname}

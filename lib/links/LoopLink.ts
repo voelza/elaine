@@ -76,7 +76,6 @@ export default class LoopLink implements StateLink {
             loopInstance.merge(this.instance);
             loopInstance.addState(this.loopValueName, new LoopState(loopValue, this.binding.state!));
             loopInstance.addState("_index", new ImmutableState(i));
-            console.log(loopInstance);
             loopInstance.appendMount(this.forComment);
             this.loopInstances.push(loopInstance);
         }

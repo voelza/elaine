@@ -8,7 +8,7 @@ import Component from "./Component";
 import ComputedState from "./states/ComputedState";
 import { insertAfter } from "./utils/DOM";
 import { link } from "./links/Linker";
-import { InstanceState, SetupState } from "./PublicTypes";
+import { InstanceState, Prop, SetupState } from "./PublicTypes";
 import { StateBinding } from "./states/StateBinding";
 import { retrieveBindings } from "./utils/RegexMatcher";
 import RenderLink from "./links/RenderLink";
@@ -34,7 +34,7 @@ export default class Instance {
     private condition: Condition | undefined;
     private conditionLink: RenderLink | undefined;
 
-    private props: string[] = [];
+    private props: Prop<any>[] = [];
     private slots: string[] = [];
     private setup: ((state: InstanceState) => SetupState | void) | undefined;
     private onMounted: ((state: InstanceState) => void) | undefined;
@@ -54,7 +54,7 @@ export default class Instance {
         element: Element,
         template: Element,
         parent: Instance | undefined = undefined,
-        props: string[] = [],
+        props: Prop<any>[] = [],
         slots: string[] = [],
         setup: ((state: InstanceState) => SetupState | void) | undefined = undefined,
         onMounted: ((state: InstanceState) => void) | undefined = undefined,
@@ -254,7 +254,8 @@ export default class Instance {
     }
 
     private resolveProps(element: Element, parent: Instance | undefined): void {
-        for (const propName of this.props) {
+        for (const prop of this.props) {
+            const propName = prop.name;
             const propAttr = element.getAttribute(propName);
             if (propAttr) {
                 const stateName = propAttr.substring(BINDING.length);
@@ -264,14 +265,40 @@ export default class Instance {
                     this.internalState.data[propName] = state;
                 } else if (propAttr) {
                     // It must be a constants
-                    const immutableState = new ImmutableState(propAttr);
+                    const immutableState = new ImmutableState(this.parseIntoType(prop.type, propAttr));
                     this.states.set(propName, immutableState);
                     this.internalState.data[propName] = state;
                 }
 
                 element.removeAttribute(propName);
+            } else {
+                if (prop.required || prop.required === undefined) {
+                    throw `Prop-Read-Error: "${propName}" is a required prop and was not provided.`
+                } else {
+                    const defaultState = new ImmutableState(prop.default);
+                    this.states.set(propName, defaultState);
+                    this.internalState.data[propName] = prop.default;
+                }
             }
         }
+    }
+
+    private parseIntoType(type: any, value: string): any {
+        if (value === "null") {
+            return null;
+        } else if (value === "undefined") {
+            return undefined;
+        } else if (type === Number) {
+            if (value.includes(".")) {
+                return Number.parseFloat(value);
+            }
+            return Number.parseInt(value);
+        } else if (type === Boolean) {
+            return value === "true";
+        } else if (type === Object || type === Array) {
+            return JSON.parse(value);
+        }
+        return value;
     }
 
     private resolveSetup(): void {

@@ -13,7 +13,7 @@ export type SetupState = {
 export type ComponentData = {
     name: string;
     template: string | Element;
-    props?: string[];
+    props?: Prop<any>[];
     slots?: string[];
     setup?: (state: InstanceState) => SetupState | void;
     onMounted?: (state: InstanceState) => void;
@@ -34,4 +34,11 @@ export type InstanceState = {
 
 export interface ComputedState<T> {
     value: T
+}
+
+export type Prop<T> = {
+    name: string,
+    required?: boolean,
+    type: T,
+    default?: T
 }

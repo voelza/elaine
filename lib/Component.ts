@@ -1,10 +1,10 @@
 import Instance, { Origin } from "./Instance";
-import { InstanceState, SetupState } from "./PublicTypes";
+import { InstanceState, Prop, SetupState } from "./PublicTypes";
 
 export default class Component {
     name: string;
     private template: Element;
-    private props: string[] = [];
+    private props: Prop<any>[] = [];
     private slots: string[] = [];
     private setup: ((state: InstanceState) => SetupState | void) | undefined;
     private onMounted: ((state: InstanceState) => void) | undefined;
@@ -17,7 +17,7 @@ export default class Component {
     constructor(
         name: string,
         element: Element,
-        props: string[] = [],
+        props: Prop<any>[] = [],
         slots: string[] = [],
         setup: ((state: InstanceState) => SetupState | void) | undefined = undefined,
         onMounted: ((state: InstanceState) => void) | undefined = undefined,

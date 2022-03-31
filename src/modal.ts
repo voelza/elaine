@@ -47,7 +47,10 @@ export default Elaine.component({
             gap: 5px;
         }
     `,
-    props: ["title"],
+    props: [{
+        name: "title",
+        type: String
+    }],
     slots: ["content", "header"],
     setup: (state: InstanceState) => {
         const modal: Element = state.element;

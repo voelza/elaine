@@ -252,10 +252,14 @@ export default class Instance {
                 if (variant) {
                     slotOnElement.setAttribute(SLOT_INDICATOR, "");
                     slotOnElement.setAttribute(SLOT_RESOLVER, variant);
+                    insertBefore(slotOnElement, slotOnComponent);
+                } else {
+                    for (const child of Array.from(slotOnElement.childNodes)) {
+                        insertBefore(child, slotOnComponent);
+                    }
                 }
-                insertBefore(slotOnElement, slotOnComponent);
+                slotOnComponent?.remove();
             }
-            slotOnComponent?.remove();
         }
     }
 

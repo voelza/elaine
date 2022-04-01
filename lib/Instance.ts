@@ -6,7 +6,7 @@ import MutableState from "./states/MutableState";
 import ImmutableState from "./states/ImmutableState";
 import Component from "./Component";
 import ComputedState from "./states/ComputedState";
-import { insertAfter } from "./utils/DOM";
+import { insertAfter, insertBefore } from "./utils/DOM";
 import { link } from "./links/Linker";
 import { InstanceState, Prop, SetupState } from "./PublicTypes";
 import { StateBinding } from "./states/StateBinding";
@@ -19,6 +19,9 @@ export enum Origin {
     IF,
     LOOP
 }
+
+export const SLOT_INDICATOR = "elaine-slot";
+export const SLOT_RESOLVER = "elaine-slot-resolver";
 
 export default class Instance {
     private origin: Origin;
@@ -238,18 +241,21 @@ export default class Instance {
 
     private resolveSlots(element: Element): void {
         for (const slotName of this.slots) {
-            const slotOnThisComponent = this.template.querySelector(slotName);
-            const slotTemplateOnElement = element.querySelector(slotName);
-
-            if (slotTemplateOnElement && slotTemplateOnElement.parentNode) {
-                slotTemplateOnElement.remove();
-
-                const children: Node[] = Array.from(slotTemplateOnElement.childNodes);
-                for (const child of children) {
-                    slotOnThisComponent?.parentNode?.insertBefore(child, slotOnThisComponent);
-                }
+            const slotOnComponent = this.template.querySelector(slotName);
+            if (!slotOnComponent) {
+                continue;
             }
-            slotOnThisComponent?.remove();
+
+            const variant = slotOnComponent.getAttribute("variant");
+            const slotOnElement = element.querySelector(slotName);
+            if (slotOnElement) {
+                if (variant) {
+                    slotOnElement.setAttribute(SLOT_INDICATOR, "");
+                    slotOnElement.setAttribute(SLOT_RESOLVER, variant);
+                }
+                insertBefore(slotOnElement, slotOnComponent);
+            }
+            slotOnComponent?.remove();
         }
     }
 

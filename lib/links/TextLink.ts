@@ -3,11 +3,11 @@ import { TEXT_BINDER } from "../Syntax";
 import DefaultTemplateLink from "./DefaultTemplateSubscriber";
 
 export default class TextLink extends DefaultTemplateLink {
-    private element: Element;
+    private text: Text;
 
-    constructor(element: Element, bindings: StateBinding[], text: string) {
+    constructor(element: Text, bindings: StateBinding[], text: string) {
         super(bindings, text.trim());
-        this.element = element;
+        this.text = element;
     }
 
     protected bindingRegex(binding: string): RegExp {
@@ -15,6 +15,6 @@ export default class TextLink extends DefaultTemplateLink {
     }
 
     protected updateBinding(updateResult: string): void {
-        this.element.textContent = updateResult;
+        this.text.textContent = updateResult;
     }
 }

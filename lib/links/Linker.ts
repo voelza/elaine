@@ -1,4 +1,4 @@
-import Instance from "../Instance";
+import Instance, { SLOT_INDICATOR, SLOT_RESOLVER } from "../Instance";
 import { createTemplateStates, Match, MatchRequest, regexMatches, regexMatchesGroups, retrieveBindings } from "../utils/RegexMatcher";
 import { StateBinding } from "../states/StateBinding";
 import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING, EVENT_LISTENER_BINDING, EVENT_LISTENER_PARENT_CALL_ID, LOOP_BINDING, TEXT_CONDITIONAL_STATE_BINDING, TEXT_STATE_BINDING } from "../Syntax";
@@ -11,12 +11,12 @@ import LoopLink from "./LoopLink";
 import AttributeLink from "./AttributeLink";
 import RenderLink from "./RenderLink";
 import Condition from "../Condition";
+import { insertBefore } from "../utils/DOM";
 
 export type Attribute = {
     name: string;
     value: string;
 };
-
 
 export function link(instance: Instance, element: Element, parent: Instance | undefined = undefined): void {
     if (element.tagName === "SCRIPT" || element instanceof Comment) {
@@ -26,6 +26,10 @@ export function link(instance: Instance, element: Element, parent: Instance | un
     if ("TEMPLATE-STATE" === element.tagName) {
         addStateFromTemplate(instance, element);
         return;
+    }
+
+    if (element.hasAttribute && element.hasAttribute(SLOT_INDICATOR)) {
+        resolveSlots(instance, element);
     }
 
     let shouldLinkChildren = true;
@@ -50,8 +54,8 @@ function linkChildren(instance: Instance, elements: NodeListOf<Node> | Element[]
     }
 }
 
-function linkTextNode(instance: Instance, element: Element): void {
-    const textContent: string | null = element.textContent;
+function linkTextNode(instance: Instance, textNode: Text): void {
+    const textContent: string | null = textNode.textContent;
     if (!textContent) {
         return;
     }
@@ -67,7 +71,7 @@ function linkTextNode(instance: Instance, element: Element): void {
     }
 
     if (bindings.length !== 0) {
-        instance.addLink(new TextLink(element, bindings, text));
+        instance.addLink(new TextLink(textNode, bindings, text));
     }
 }
 
@@ -169,3 +173,33 @@ function addStateFromTemplate(instance: Instance, element: Element) {
     }
     element.remove();
 }
+
+function resolveSlots(instance: Instance, element: Element): void {
+    const resolver = element.getAttribute(SLOT_RESOLVER);
+    const resolveState = createTemplateStates(instance, resolver!);
+
+    let displaySlot: Element | null = null;
+    for (const slot of Array.from(element.children)) {
+        const slotVariant = slot.tagName.toLowerCase();
+        if (slotVariant == resolveState?.value) {
+            displaySlot = slot;
+            break;
+        } else if (displaySlot === null && slotVariant === "default") {
+            displaySlot = slot;
+        }
+        slot.remove();
+    }
+
+    if (!displaySlot) {
+        throw "Slot-Resolve-Error: Slots with variants must provide a default slot!";
+    }
+    const displaySlotChildren: Node[] = Array.from(displaySlot.childNodes);
+    for (const child of displaySlotChildren) {
+        insertBefore(child, element);
+        if (child instanceof Text) {
+            linkTextNode(instance, child);
+        }
+    }
+    element.remove();
+}
+

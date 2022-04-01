@@ -6,9 +6,7 @@ const table = ELAINE.component({
     <table>
         <thead>
             <tr>
-                <th @@if="@@withRowNum">
-                    N#
-                </th>
+                <th @@if="@@withRowNum">#</th>
                <th @@for="header in @@headers">
                     @@{header.label}
                </th>
@@ -17,7 +15,7 @@ const table = ELAINE.component({
         <tbody>
         <tr @@for="row in @@rows">
             <td @@if="@@withRowNum">
-                @@{_index}
+                @@{rowNum(@@_index)}
             </td>
             <td @@for="header in @@headers">
                  <template-state 
@@ -25,7 +23,7 @@ const table = ELAINE.component({
                     key="@@header.key" 
                     label="@@header.label"
                     ></template-state>
-                 <column></column>
+                 <mycolumn variant="@@key"></mycolumn>
             </td>
         </tr>
         </tbody>
@@ -60,7 +58,7 @@ const table = ELAINE.component({
             default: false,
             type: Boolean
         }],
-    slots: ["column"],
+    slots: ["mycolumn"],
     setup: (state) => {
         const items = state.data.items;
         const rows = ELAINE.computed(() => items ? items.value : [], items);
@@ -77,10 +75,13 @@ const table = ELAINE.component({
             return data;
         };
 
+        const rowNum = (index: number) => index + 1;
+
         return {
             state: {
                 rows,
-                getAttribute
+                getAttribute,
+                rowNum
             }
         }
     }

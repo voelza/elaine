@@ -17,17 +17,15 @@
         </div>
         <br />
         <myTable items="@@content" headers="@@headers" withRowNum="true">
-            <column>
-                <div @@if="@@key == name">
+            <!-- Idee: conditional slots taggen mit attr für Linker und dann removen wenn nicht gebraucht -->
+            <mycolumn>
+                <name>
                     @@{data.firstname} @@{data.lastname}
-                </div>
-                <div @@if="@@key == age">
+                </name>
+                <default>
                     @@{data}
-                </div>
-                <div @@if="@@key == birthdate">
-                    @@{data}
-                </div>
-            </column>
+                </default>
+            </mycolumn>
         </myTable>
     </div>
     <script src="./table.ts" type="module"></script>

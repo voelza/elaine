@@ -16,8 +16,7 @@
             <button ++click="addNewRow">Add</button>
         </div>
         <br />
-        <myTable items="@@content" headers="@@headers" withRowNum="true">
-            <!-- Idee: conditional slots taggen mit attr für Linker und dann removen wenn nicht gebraucht -->
+        <myTable items="@@content" headers="@@headers" withRowNum="true" striped="true">
             <mycolumn>
                 <name>
                     @@{data.firstname} @@{data.lastname}

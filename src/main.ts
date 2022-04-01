@@ -37,7 +37,7 @@ const todo = Elaine.component({
   <div>
       <div class="todo-header">
         <h2>@@{todo.title}</h2>
-        <button ++click="{@@todo.done : undone(); !@@todo.done : done()}">@@{{@@todo.done : Undone;!@@todo.done: Done}}</button>
+        <button ++click="{@@todo.done : undone(); !@@todo.done : done()}">@@{{@@todo.done : ❌;!@@todo.done: ✅}}</button>
       </div>
       <div ++click="alertTodo(@@todo)">
         @@{todo.content}
@@ -116,6 +116,15 @@ const openModal = () => {
 
 const addTodoNotPossible = Elaine.computed(() => !todoTitle.value || !todoContent.value, todoTitle, todoContent);
 
+
+const done = (todo: any) => {
+  todo.done = true;
+}
+
+const undone = (todo: any) => {
+  todo.done = false;
+}
+
 const instance = Elaine.setup(app, {
   state: {
     myState,
@@ -127,7 +136,9 @@ const instance = Elaine.setup(app, {
     todoContent,
     addTodo,
     openModal,
-    addTodoNotPossible
+    addTodoNotPossible,
+    done,
+    undone
   },
   components: [
     todo, yo, modal

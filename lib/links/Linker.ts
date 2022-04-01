@@ -96,7 +96,10 @@ function linkAttributes(instance: Instance, element: Element, parent: Instance |
                 }
                 attribute.value = EVENT_LISTENER_PARENT_CALL_ID + attribute.value;
             } else {
-                linkEventListener(instance, element, attribute, parent);
+                const listener = linkEventListener(instance, element, attribute, parent);
+                if (listener) {
+                    instance.addLink(listener);
+                }
             }
         }
     }

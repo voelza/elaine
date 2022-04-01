@@ -1,4 +1,6 @@
+import Elaine from "../../../lib/Elaine";
 import ELAINE from "../../../lib/Elaine";
+import State from "../../../lib/states/State";
 
 const table = ELAINE.component({
     name: "myTable",
@@ -8,7 +10,15 @@ const table = ELAINE.component({
             <tr>
                 <th @@if="@@withRowNum">#</th>
                <th @@for="header in @@headers">
-                    @@{header.label}
+                    <div class="myTable-header">
+                        <span @@if="@@header.label">@@{header.label}</span>
+                        <span @@if="!@@header.label">@@{header.key}</span>
+                        <span class="sort-arrow-container">
+                            <span @@if="@@header.sortStatus == none" ++click="sortItems(@@header)" class="sort-arrow">&harr;</span>
+                            <span @@if="@@header.sortStatus == asc"  ++click="sortItems(@@header)" class="sort-arrow">&uarr;</span>
+                            <span @@if="@@header.sortStatus == desc" ++click="sortItems(@@header)" class="sort-arrow">&darr;</span>
+                        </span>
+                    </div>
                </th>
             </tr>
         </thead>
@@ -39,8 +49,18 @@ const table = ELAINE.component({
             padding: 5px;
         }
 
-        th {
+        .myTable-header {
             text-transform: capitalize;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sort-arrow {
+            display: block;
+            width: 10px;
+            cursor: pointer;
         }
     `,
     props: [
@@ -60,8 +80,61 @@ const table = ELAINE.component({
         }],
     slots: ["mycolumn"],
     setup: (state) => {
+        const headers = state.data.headers;
+        headers.value.forEach((element: any) => {
+            element.sortStatus = "none";
+        });
+
+        let sortHeader: State<any | null> = Elaine.state(null);
+        const sortItems = (header: any) => {
+            if (header.sortStatus === "none") {
+                header.sortStatus = "asc";
+                sortHeader.value = header;
+            } else if (header.sortStatus === "asc") {
+                header.sortStatus = "desc";
+                sortHeader.value = header;
+            } else {
+                header.sortStatus = "none";
+                sortHeader.value = null;
+            }
+
+
+            for (const h of headers.value) {
+                if (h.key !== header.key) {
+                    h.sortStatus = "none";
+                }
+            }
+            headers.notify();
+        };
+
         const items = state.data.items;
-        const rows = ELAINE.computed(() => items ? items.value : [], items);
+        const rows = ELAINE.computed(() => {
+            const i = Array.from(items.value);
+            if (sortHeader.value !== null) {
+                i.sort((a: any, b: any) => {
+                    const a1 = a[sortHeader.value.key];
+                    const b1 = b[sortHeader.value.key];
+
+                    if (sortHeader.value.sortBy) {
+                        return sortHeader.value.sortBy(a1, b1, sortHeader.value.sortStatus);
+                    }
+
+                    if (sortHeader.value.sortStatus == "asc") {
+                        if (a1 instanceof String) {
+                            return a1.localeCompare(b1);
+                        }
+                        return a1 - b1;
+                    } else {
+                        if (b1 instanceof String) {
+                            return b1.localeCompare(a1);
+                        }
+                        return b1 - a1;
+                    }
+                });
+            }
+            console.log(i);
+            return i;
+        }, items, sortHeader);
 
         const getAttribute = (attribute: string, row: any) => {
             if (!row) {
@@ -72,7 +145,7 @@ const table = ELAINE.component({
             if (data instanceof Date) {
                 return (data as Date).toLocaleDateString();
             }
-            return data;
+            return data ?? "";
         };
 
         const rowNum = (index: number) => index + 1;
@@ -81,7 +154,8 @@ const table = ELAINE.component({
             state: {
                 rows,
                 getAttribute,
-                rowNum
+                rowNum,
+                sortItems
             }
         }
     }
@@ -93,24 +167,27 @@ const content = ELAINE.state([
             firstname: "Achim",
             lastname: "Yo"
         },
-        age: 30,
-        birthdate: new Date("1991-12-09")
+        age: 1,
+        birthdate: new Date("1991-12-09"),
+        random: "871h28"
     },
     {
         name: {
             firstname: "Achim",
             lastname: "Yo1"
         },
-        age: 30,
-        birthdate: new Date("1991-12-09")
+        age: 36,
+        birthdate: new Date("1991-12-09"),
+        random: "871dasdasqwh28"
     },
     {
         name: {
             firstname: "Achim",
             lastname: "Yo2"
         },
-        age: 30,
-        birthdate: new Date("1991-12-09")
+        age: 4,
+        birthdate: new Date("1991-12-09"),
+        random: "124eqwdads"
     },
     {
         name: {
@@ -118,7 +195,8 @@ const content = ELAINE.state([
             lastname: "Yo3"
         },
         age: 30,
-        birthdate: new Date("1991-12-09")
+        birthdate: new Date("1991-12-09"),
+        random: "12dascxys"
     },
 ]);
 
@@ -135,7 +213,8 @@ const addNewRow = () => {
             lastname: ""
         },
         age: newRow.value.age,
-        birthdate: new Date(newRow.value.birthdate)
+        birthdate: new Date(newRow.value.birthdate),
+        random: "asdasdas"
     });
 
     newRow.value.name = "";
@@ -147,7 +226,15 @@ const addNewRow = () => {
 const headers = ELAINE.state([
     {
         label: "My Cool Name",
-        key: "name"
+        key: "name",
+        sortBy: (a: any, b: any, sortDirection: string) => {
+            console.log(a, b, sortDirection);
+            if (sortDirection === "asc") {
+                return a.lastname.localeCompare(b.lastname);
+            } else {
+                return b.lastname.localeCompare(a.lastname);
+            }
+        }
     },
     {
         label: "age",
@@ -156,6 +243,9 @@ const headers = ELAINE.state([
     {
         label: "birthday",
         key: "birthdate"
+    },
+    {
+        key: "yo"
     }
 ]);
 

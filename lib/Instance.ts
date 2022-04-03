@@ -287,8 +287,8 @@ export default class Instance {
                         insertBefore(child, slotOnComponent);
                     }
                 }
-                slotOnComponent?.remove();
             }
+            slotOnComponent.remove();
         }
     }
 

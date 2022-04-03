@@ -22,7 +22,7 @@
                     @@{constant}
                     @@{getFirstName(@@~data)} @@{~data.lastname}
                 </name>
-                <birthdate>@@{$dt(@@~data)}</birthdate>
+                <birthdate>@@{$dateTime(@@~data)}</birthdate>
                 <default>
                     <div ++click="showData(@@~data, @@~constant)">@@{~data}</div>
                 </default>

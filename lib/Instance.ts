@@ -27,6 +27,9 @@ export const SLOT_RESOLVER = "elaine-slot-resolver";
 function dateToDateStr(date: Date): string {
     return date.toLocaleDateString();
 }
+function dateToTimeStr(date: Date): string {
+    return date.toLocaleTimeString();
+}
 function dateToDateTimeStr(date: Date): string {
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 }
@@ -126,8 +129,9 @@ export default class Instance {
 
         this.wasCreated = false;
 
-        this.methods.set("$d", dateToDateStr);
-        this.methods.set("$dt", dateToDateTimeStr);
+        this.methods.set("$date", dateToDateStr);
+        this.methods.set("$time", dateToTimeStr);
+        this.methods.set("$dateTime", dateToDateTimeStr);
 
         if (this.components.size > 0) {
             for (const component of this.components.values()) {

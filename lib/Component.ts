@@ -5,7 +5,7 @@ export default class Component {
     name: string;
     private template: Element;
     private props: Prop<any>[] = [];
-    private slots: string[] = [];
+    slots: string[] = [];
     private setup: ((state: InstanceState) => SetupState | void) | undefined;
     private onMounted: ((state: InstanceState) => void) | undefined;
     private beforeUnmounted: ((state: InstanceState) => void) | undefined;

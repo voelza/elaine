@@ -23,10 +23,20 @@ export enum Origin {
 export const SLOT_INDICATOR = "elaine-slot";
 export const SLOT_RESOLVER = "elaine-slot-resolver";
 
+
+function dateToDateStr(date: Date): string {
+    return date.toLocaleDateString();
+}
+function dateToDateTimeStr(date: Date): string {
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+}
+
+const componentElements: string[] = [];
+
 export default class Instance {
     private origin: Origin;
     private element: Element;
-    private parent: Instance | undefined = undefined;
+    parent: Instance | undefined = undefined;
     private template: Element;
     private states: Map<string, State<any>> = new Map();
     private methods: Map<string, Function> = new Map();
@@ -115,6 +125,22 @@ export default class Instance {
         }
 
         this.wasCreated = false;
+
+        this.methods.set("$d", dateToDateStr);
+        this.methods.set("$dt", dateToDateTimeStr);
+
+        if (this.components.size > 0) {
+            for (const component of this.components.values()) {
+                componentElements.push(component.name);
+                for (const elementName of component.slots) {
+                    componentElements.push(elementName.toUpperCase());
+                }
+            }
+        }
+    }
+
+    isComponentElement(tagName: string): boolean {
+        return componentElements.includes(tagName);
     }
 
     setupIfNeeded(): void {
@@ -141,8 +167,6 @@ export default class Instance {
             link.init();
         }
         this.initComponents([this.template]);
-
-        // refs maybe
 
         this.wasCreated = true;
     }
@@ -173,6 +197,8 @@ export default class Instance {
         for (const component of instance.components.entries()) {
             this.registerComponent(component[0], component[1]);
         }
+
+        this.parent = instance.parent;
         return this;
     }
 
@@ -218,9 +244,6 @@ export default class Instance {
             return;
         }
         insertAfter(this.template, comment);
-        if (this.styleElement) {
-            insertAfter(this.styleElement, comment);
-        }
         this.setupIfNeeded();
 
 

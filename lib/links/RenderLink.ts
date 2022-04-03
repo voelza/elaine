@@ -27,7 +27,7 @@ export default class Renderlink extends DefaultLink implements StateLink {
         this.element = element;
         this.element.removeAttribute(BINDING + "if");
 
-        this.instance = orignalInstance ?? new Instance(Origin.LOOP, this.element, this.element).merge(parent);
+        this.instance = orignalInstance ?? new Instance(Origin.IF, this.element, this.element).merge(parent);
         this.element.remove();
     }
 

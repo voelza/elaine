@@ -1,7 +1,7 @@
 import Instance, { SLOT_INDICATOR, SLOT_RESOLVER } from "../Instance";
 import { createTemplateStates, Match, MatchRequest, regexMatches, regexMatchesGroups, retrieveBindings } from "../utils/RegexMatcher";
 import { StateBinding } from "../states/StateBinding";
-import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING, EVENT_LISTENER_BINDING, EVENT_LISTENER_PARENT_CALL_ID, LOOP_BINDING, TEXT_CONDITIONAL_STATE_BINDING, TEXT_STATE_BINDING } from "../Syntax";
+import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING, EVENT_LISTENER_BINDING, EVENT_LISTENER_PARENT_CALL_ID, LOOP_BINDING, TEMPLATE_PARENT_CALL, TEXT_CONDITIONAL_STATE_BINDING, TEXT_STATE_BINDING } from "../Syntax";
 import TextLink from "./TextLink";
 import { getBindingNameFromKeyPath, getValuePath } from "../utils/PathHelper";
 import State from "../states/State";
@@ -29,7 +29,8 @@ export function link(instance: Instance, element: Element, parent: Instance | un
     }
 
     if (element.hasAttribute && element.hasAttribute(SLOT_INDICATOR)) {
-        resolveSlots(instance, element);
+        resolveSlots(instance, element, parent);
+        return;
     }
 
     let shouldLinkChildren = true;
@@ -41,8 +42,8 @@ export function link(instance: Instance, element: Element, parent: Instance | un
         linkTextNode(instance, element);
     }
 
-    if (shouldLinkChildren && element.hasChildNodes()) {
-        // only if element has no if or for loop. then its managed by different instance
+    if (shouldLinkChildren && element.hasChildNodes() && !instance.isComponentElement(element.tagName)) {
+        // only if element has no if or for-loop or component. then its managed by different instance
         linkChildren(instance, element.childNodes, parent);
     }
 }
@@ -128,9 +129,13 @@ function linkLoop(instance: Instance, element: Element, attribute: Attribute): v
 }
 
 function linkModel(instance: Instance, element: Element, attribute: Attribute): void {
-    const bindingName = attribute.value.replaceAll(BINDING, '').trim();
+    const attrValue = attribute.value.replaceAll(BINDING, '').trim();
+    const isParentCall: boolean = attrValue.startsWith(TEMPLATE_PARENT_CALL);
+    const bindingName = isParentCall ? attrValue.substring(TEMPLATE_PARENT_CALL.length) : attrValue;
+    const lookupInstance: Instance = isParentCall ? instance.parent! : instance;
+
     const stateName = getBindingNameFromKeyPath(bindingName);
-    const state: State<any> | undefined = instance.getState(stateName);
+    const state: State<any> | undefined = lookupInstance.getState(stateName);
     if (!state) {
         return;
     }
@@ -142,9 +147,9 @@ function linkModel(instance: Instance, element: Element, attribute: Attribute): 
         state: state
     }
 
-    const modelLink: ModelLink = new ModelLink(instance, element, binding);
+    const modelLink: ModelLink = new ModelLink(lookupInstance, element, binding);
     state.subscribe(modelLink);
-    instance.addLink(modelLink);
+    lookupInstance.addLink(modelLink);
 }
 
 function linkConditionalRendering(instance: Instance, element: Element, attribute: Attribute): void {
@@ -177,7 +182,7 @@ function addStateFromTemplate(instance: Instance, element: Element) {
     element.remove();
 }
 
-function resolveSlots(instance: Instance, element: Element): void {
+function resolveSlots(instance: Instance, element: Element, parent: Instance | undefined): void {
     const resolver = element.getAttribute(SLOT_RESOLVER);
     const resolveState = createTemplateStates(instance, resolver!);
 
@@ -199,9 +204,7 @@ function resolveSlots(instance: Instance, element: Element): void {
     const displaySlotChildren: Node[] = Array.from(displaySlot.childNodes);
     for (const child of displaySlotChildren) {
         insertBefore(child, element);
-        if (child instanceof Text) {
-            linkTextNode(instance, child);
-        }
+        link(instance, child as Element, parent);
     }
     element.remove();
 }

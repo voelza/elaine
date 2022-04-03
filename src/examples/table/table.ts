@@ -174,20 +174,18 @@ const table = ELAINE.component({
             }
 
             const data = row[attribute];
-            if (data instanceof Date) {
-                return (data as Date).toLocaleDateString();
-            }
             return data ?? "";
         };
 
         const rowNum = (index: number) => index + 1;
-
+        const constant = 2;
         return {
             state: {
                 rows,
                 getAttribute,
                 rowNum,
-                sortItems
+                sortItems,
+                constant
             }
         }
     }
@@ -206,7 +204,7 @@ type Item = {
 }
 
 const content: State<Item[]> = ELAINE.state([]);
-for (let i = 1; i <= 100; i++) {
+for (let i = 1; i <= 400; i++) {
     content.value.push(
         {
             name: {

@@ -1,6 +1,6 @@
 import Condition from "./Condition";
 import State from "./states/State";
-import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING, TEMPLATE_PARENT_CALL } from "./Syntax";
+import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING, EVENT_LISTENER_BINDING, TEMPLATE_PARENT_CALL, TEXT_STATE_BINDING } from "./Syntax";
 import StateLink from "./links/StateLink";
 import MutableState from "./states/MutableState";
 import ImmutableState from "./states/ImmutableState";
@@ -278,6 +278,7 @@ export default class Instance {
             const variant = slotOnComponent.getAttribute("variant");
             const slotOnElement = element.querySelector(slotName);
             if (slotOnElement) {
+                invertParentCalls(slotOnElement);
                 if (variant) {
                     slotOnElement.setAttribute(SLOT_INDICATOR, "");
                     slotOnElement.setAttribute(SLOT_RESOLVER, variant);
@@ -427,4 +428,40 @@ export default class Instance {
             this.onDestroyed(this.internalState);
         }
     }
+}
+
+function invertParentCalls(slot: Element) {
+    if (slot instanceof Text && slot.textContent && slot.textContent.length !== 0) {
+        const newText = slot.textContent
+            .replaceAll(TEXT_STATE_BINDING, (_, g) => BINDING + "{" + invertParentCall(g) + "}")
+            .replaceAll(ATTRIBUTE_ELEMENT_STATE_BINDING, (_, a) => BINDING + invertParentCall(a));
+        slot.textContent = newText;
+    } else if (slot.hasAttributes()) {
+        for (const attribute of Array.from(slot.attributes)) {
+            if (attribute.name === BINDING + "model") {
+                attribute.value = invertParentCall(attribute.value.replace(BINDING, ""));
+            } else if (attribute.name.startsWith(EVENT_LISTENER_BINDING)) {
+                attribute.value = invertParentCall(attribute.value)
+                    .replaceAll(ATTRIBUTE_ELEMENT_STATE_BINDING, (_, a) => BINDING + invertParentCall(a));
+            } else {
+                attribute.value = attribute.value
+                    .replaceAll(ATTRIBUTE_ELEMENT_STATE_BINDING, (_, a) => BINDING + invertParentCall(a));
+            }
+        }
+    }
+
+    if (slot.hasChildNodes()) {
+        invertChildrentParentCalls(slot.childNodes);
+    }
+}
+
+function invertChildrentParentCalls(slotChildren: NodeListOf<Node> | Element[]) {
+    for (let i = 0; i < slotChildren.length; i++) {
+        const element = slotChildren[i];
+        invertParentCalls(element as Element);
+    }
+}
+
+function invertParentCall(template: string): string {
+    return template.startsWith(TEMPLATE_PARENT_CALL) ? template.substring(TEMPLATE_PARENT_CALL.length) : TEMPLATE_PARENT_CALL + template;
 }

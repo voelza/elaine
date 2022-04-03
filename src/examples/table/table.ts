@@ -276,6 +276,11 @@ const getFirstName = (name: Name) => {
 
 const constant = 1;
 
+const showData = (data: any, data2: any) => {
+    window.alert(JSON.stringify(data) + " " + JSON.stringify(data2));
+}
+
+
 ELAINE.setup(document.getElementById("app")!, {
     state: {
         content,
@@ -283,7 +288,8 @@ ELAINE.setup(document.getElementById("app")!, {
         newRow,
         addNewRow,
         getFirstName,
-        constant
+        constant,
+        showData
     },
     components: [table]
 });

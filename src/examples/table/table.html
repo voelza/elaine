@@ -20,11 +20,11 @@
             <mycolumn>
                 <name>
                     @@{constant}
-                    @@{~getFirstName(@@data)} @@{data.lastname}
+                    @@{getFirstName(@@~data)} @@{~data.lastname}
                 </name>
-                <birthdate>@@{$dt(@@data)}</birthdate>
+                <birthdate>@@{$dt(@@~data)}</birthdate>
                 <default>
-                    @@{data}
+                    <div ++click="showData(@@~data, @@~constant)">@@{~data}</div>
                 </default>
             </mycolumn>
         </myTable>

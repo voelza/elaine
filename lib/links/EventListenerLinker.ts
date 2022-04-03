@@ -57,7 +57,7 @@ export function createEventListener(instance: Instance, element: Element | undef
     const listenerName: string = functionInfo.name;
     const bindings: StateBinding[] = functionInfo.params;
 
-    const method: Function | undefined = listenerName.startsWith(TEMPLATE_PARENT_CALL) ? instance.parent!.getMethod(listenerName.substring(TEMPLATE_PARENT_CALL.length)) : instance.getMethod(listenerName);
+    const method: Function | undefined = instance.getMethod(listenerName);
     if (method) {
         return new EventListenerLink(element, bindings, eventName, method);
     }

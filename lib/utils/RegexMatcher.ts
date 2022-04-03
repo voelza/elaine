@@ -5,7 +5,7 @@ import { StateBinding } from "../states/StateBinding";
 import EventListenerLink from "../links/EventListenerLink";
 import { createEventListener } from "../links/EventListenerLinker";
 import ComputedState from "../states/ComputedState";
-import { BINDING, TEMPLATE_PARENT_CALL } from "../Syntax";
+import { BINDING } from "../Syntax";
 
 export type MatchRequest = {
     matches: Match[]
@@ -68,18 +68,16 @@ export function regexMatchesGroups(regex: RegExp, str: string, groups: number[] 
 export function retrieveBindings(instance: Instance, regex: RegExp, str: string, group: number = 1): StateBinding[] {
     return getMatchingReactiveBindings(regex, str, group)
         .filter(binding => {
-            const isParentCall: boolean = binding.stateName.startsWith(TEMPLATE_PARENT_CALL);
-            const lookupInstance: Instance = isParentCall ? instance.parent! : instance;
-            const name: string = isParentCall ? binding.stateName.substring(1) : binding.stateName;
+            const name: string = binding.stateName;
 
-            const state: State<any> | undefined = lookupInstance.getState(name);
+            const state: State<any> | undefined = instance.getState(name);
             if (state) {
                 binding.state = state;
                 return true;
             }
 
             const methodName: string = name.substring(0, name.indexOf("(")).trim();
-            const method: Function | undefined = lookupInstance.getMethod(methodName);
+            const method: Function | undefined = instance.getMethod(methodName);
             if (!method) {
                 return false;
             }
@@ -102,7 +100,7 @@ export function retrieveBindings(instance: Instance, regex: RegExp, str: string,
             for (const state of eventListenerBindings) {
                 state.subscribe(computed);
             }
-            lookupInstance.addLink(computed);
+            instance.addLink(computed);
 
             binding.stateName = methodName;
             binding.state = computed;
@@ -112,14 +110,11 @@ export function retrieveBindings(instance: Instance, regex: RegExp, str: string,
 
 
 function createComputedShell(instance: Instance, str: string) {
-    const isParentCall: boolean = str.startsWith(TEMPLATE_PARENT_CALL);
-    const lookupInstance: Instance = isParentCall ? instance.parent! : instance;
-
     if (str.startsWith(BINDING)) {
         // must be state
-        const bindingName = isParentCall ? str.substring(BINDING.length + 1) : str.substring(BINDING.length);
+        const bindingName = str.substring(BINDING.length);
         const stateName = getBindingNameFromKeyPath(bindingName);
-        const state: State<any> | undefined = lookupInstance.getState(stateName);
+        const state: State<any> | undefined = instance.getState(stateName);
         if (state) {
             return {
                 computer: () => getValue(bindingName, state.value),
@@ -128,7 +123,7 @@ function createComputedShell(instance: Instance, str: string) {
         }
     }
     const methodName: string = str.substring(0, str.indexOf("(")).trim();
-    const method: Function | undefined = lookupInstance.getMethod(methodName);
+    const method: Function | undefined = instance.getMethod(methodName);
     if (method) {
         const eventListener: EventListenerLink | undefined = createEventListener(instance, undefined, "", str)!;
         const eventListenerBindings: State<any>[] = [];

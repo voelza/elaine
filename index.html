@@ -34,6 +34,7 @@
     <modal ref="modal" title="Add a new tab!">
       <content>
         <h2>@@{title}</h2>
+        es sollte anders herum sein ... @@~ sollte slot prop meinen
         <input @@model="@@~todoTitle" type="text" placeholder="ToDo title" />
         <textarea @@model="@@~todoContent" placeholder="ToDo content" rows="5"></textarea>
         <button ++click="~addTodo" @@disabled="@@~addTodoNotPossible">Add Todo</button>

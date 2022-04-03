@@ -19,10 +19,8 @@
         <myTable items="@@content" headers="@@headers" withRowNum="true" striped="true">
             <mycolumn>
                 <name>
-                    <div>
-                        @@{constant}
-                        @@{~getFirstName(@@data)} @@{data.lastname}
-                    </div>
+                    @@{constant}
+                    @@{~getFirstName(@@data)} @@{data.lastname}
                 </name>
                 <birthdate>@@{$dt(@@data)}</birthdate>
                 <default>

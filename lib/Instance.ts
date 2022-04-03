@@ -1,6 +1,6 @@
 import Condition from "./Condition";
 import State from "./states/State";
-import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING } from "./Syntax";
+import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING, TEMPLATE_PARENT_CALL } from "./Syntax";
 import StateLink from "./links/StateLink";
 import MutableState from "./states/MutableState";
 import ImmutableState from "./states/ImmutableState";
@@ -176,6 +176,9 @@ export default class Instance {
     }
 
     getState(name: string): State<any> | undefined {
+        if (name.startsWith(TEMPLATE_PARENT_CALL)) {
+            return this.parent?.getState(name.substring(TEMPLATE_PARENT_CALL.length));
+        }
         return this.states.get(name);
     }
 
@@ -203,6 +206,9 @@ export default class Instance {
     }
 
     getMethod(methodName: string): Function | undefined {
+        if (methodName.startsWith(TEMPLATE_PARENT_CALL)) {
+            return this.parent?.getMethod(methodName.substring(TEMPLATE_PARENT_CALL.length));
+        }
         return this.methods.get(methodName);
     }
 

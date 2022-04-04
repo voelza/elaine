@@ -8,6 +8,28 @@
 </head>
 
 <body>
+    <style>
+        .elapsed-container {
+            width: 300px;
+        }
+
+        .elapsed-bar {
+            background-color: red;
+            height: 10px;
+        }
+    </style>
+    <div id="app">
+        <label>Elapsed Time: <progress @@value="@@progress"></progress></label>
+
+        <div>@@{elapseDisplay}s</div>
+
+        <div>
+            Duration: <input type="range" @@model="duration" min="1" max="30000">
+            @@{ durationDisplay } s
+        </div>
+
+        <button ++click="reset">Reset</button>
+    </div>
     <script src="./app.ts" type="module"></script>
 </body>
 

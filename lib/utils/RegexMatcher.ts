@@ -28,10 +28,11 @@ export function regexMatches(regex: RegExp, str: string, group: number = 0): str
 
 function getMatchingReactiveBindings(regex: RegExp, str: string, group: number = 1): StateBinding[] {
     const matches: string[] = regexMatches(regex, str, group);
+
     return matches.map(match => {
         const bindingName = match;
-        const stateName = getBindingNameFromKeyPath(bindingName);
-        const stateSubPath = getValuePath(bindingName);
+        const stateName = getBindingNameFromKeyPath(bindingName).trim();
+        const stateSubPath = getValuePath(bindingName).trim();
 
         const reactiveBinding: StateBinding = {
             binding: bindingName,

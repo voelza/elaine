@@ -51,7 +51,7 @@ Object.defineProperty(Object.prototype, "getValueForKeyPath", {
 });
 
 
-function setup(element: Element, setupState: SetupState | undefined): InstanceState {
+function setup(element: Element, setupState: SetupState | undefined = undefined): InstanceState {
     const instance = new Instance(
         Origin.SETUP,
         element,

@@ -58,7 +58,7 @@ export default class ModelLink implements StateLink {
 
     update() {
         if (this.isPathValue) {
-            (this.element as any)[this.targetAttribute] = this.binding.state?.value.getValueForKeyPath(this.binding.stateSubPath);
+            (this.element as any)[this.targetAttribute] = this.binding.state?.value?.getValueForKeyPath(this.binding.stateSubPath);
         } else {
             (this.element as any)[this.targetAttribute] = this.binding.state?.value;
         }

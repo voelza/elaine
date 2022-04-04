@@ -8,6 +8,46 @@
 </head>
 
 <body>
+    <style>
+        * {
+            font-size: inherit;
+        }
+
+        input {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        select {
+            float: left;
+            margin: 0 1em 1em 0;
+            width: 14em;
+        }
+
+        .buttons {
+            clear: both;
+        }
+
+        button+button {
+            margin-left: 5px;
+        }
+    </style>
+    <div id="app">
+        <div><input @@model="prefix" placeholder="Filter prefix"></div>
+
+        <select size="5" @@model="selected">
+            <option @@for="name in @@filteredNames">@@{ name }</option>
+        </select>
+
+        <label>Name: <input @@model="first"></label>
+        <label>Surname: <input @@model="last"></label>
+
+        <div class="buttons">
+            <button ++click="create">Create</button>
+            <button ++click="update">Update</button>
+            <button ++click="del">Delete</button>
+        </div>
+    </div>
     <script src="./app.ts" type="module"></script>
 </body>
 

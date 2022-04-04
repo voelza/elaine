@@ -21,7 +21,7 @@ export default class Condition {
 
             if (t.startsWith(BINDING)) {
                 const bindingName: string = t.substring(BINDING.length);
-                const binding: StateBinding | undefined = bindings.find(b => b.binding === bindingName);
+                const binding: StateBinding | undefined = bindings.find(b => b.stateName === bindingName);
                 if (binding) {
                     this.bindingsMap.set(bindingName, binding);
                 }
@@ -101,7 +101,7 @@ export default class Condition {
     }
 
     private isOperator(text: string): boolean {
-        return text === "<" || text === "<=" || text === ">" || text === ">=" || text === "==" || text === "!=";
+        return text === "<" || text === "<=" || text === ">" || text === ">=" || text === "==" || text === "!=" || text === "!==" || text === "===";
     }
 
     private parseValue(value: any): any {
@@ -126,9 +126,25 @@ export default class Condition {
         } else if (operator === ">=") {
             return f >= s;
         } else if (operator === "==") {
+            if (f instanceof Object && s instanceof Object) {
+                return JSON.stringify(f) == JSON.stringify(s);
+            }
             return f == s;
+        } else if (operator === "===") {
+            if (f instanceof Object && s instanceof Object) {
+                return JSON.stringify(f) === JSON.stringify(s);
+            }
+            return f === s;
         } else if (operator === "!=") {
+            if (f instanceof Object && s instanceof Object) {
+                return JSON.stringify(f) != JSON.stringify(s);
+            }
             return f != s;
+        } else if (operator === "!==") {
+            if (f instanceof Object && s instanceof Object) {
+                return JSON.stringify(f) !== JSON.stringify(s);
+            }
+            return f !== s;
         } else {
             return false;
         }

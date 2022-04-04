@@ -8,6 +8,69 @@
 </head>
 
 <body>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 99.9%;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+        tr:first-of-type th {
+            width: 100px;
+        }
+
+        tr:first-of-type th:first-of-type {
+            width: 25px;
+        }
+
+        td {
+            border: 1px solid #ccc;
+            height: 1.5em;
+            overflow: hidden;
+        }
+
+        .cell,
+        .cell input {
+            height: 1.5em;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        .cell span {
+            padding: 0 6px;
+        }
+
+        .cell input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+    <div id="app">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th @@for="c in @@cols">@@{ c }</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr @@for="i in @@colsLengthAsArray">
+                    <th>@@{i}</th>
+                    <td @@for="c in @@cols">
+                        <cell r="@@i" c="@@_index"></cell>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <script src="./app.ts" type="module"></script>
 </body>
 

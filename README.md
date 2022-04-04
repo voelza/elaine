@@ -28,7 +28,7 @@ States can be variables which where called by the `state(value)` method (as you 
 The template portion of your application can be directly in the DOM itself.
 ```html
     <div id="app">
-        <h1>@@{immutableState</h1>
+        <h1>@@{immutableState}</h1>
         @@{counter}
         <button ++click="increaseCounter">Count</button>
     </div>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>7 7GUIs Index</title>
+</head>
+
+<body>
+    <style>
+        select,
+        input,
+        button {
+            display: block;
+            margin: 0.5em 0;
+            font-size: 15px;
+        }
+
+        input[disabled] {
+            color: #999;
+        }
+
+        p {
+            color: red;
+        }
+    </style>
+    <div id="app">
+        <select @@model="flightType">
+            <option value="one-way flight">One-way Flight</option>
+            <option value="return flight">Return Flight</option>
+        </select>
+        <input type="date" @@model="departureDate">
+        <input type="date" @@model="returnDate" @@disabled="@@!isReturn">
+
+        <button @@disabled="@@!canBook" ++click="book">Book</button>
+
+        <p>@@{{ !@@canBook : Return date must be after departure date. }}</p>
+    </div>
+    <script src="./app.ts" type="module"></script>
+</body>
+
+</html>

@@ -183,7 +183,21 @@ export default class Instance {
         if (name.startsWith(TEMPLATE_PARENT_CALL)) {
             return this.parent?.getState(name.substring(TEMPLATE_PARENT_CALL.length));
         }
-        return this.states.get(name);
+        const foundState = this.states.get(name);
+        if (!name.startsWith("!")) {
+            return foundState;
+        }
+
+        const originalState = this.states.get(name.substring(1));
+        if (!originalState) {
+            return undefined;
+        }
+
+        const negateState = new ComputedState(() => !originalState.value, [originalState]);
+        originalState.subscribe(negateState);
+        this.states.set(name, negateState);
+        this.addLink(negateState);
+        return negateState;
     }
 
     addState(name: string, state: State<any>): void {

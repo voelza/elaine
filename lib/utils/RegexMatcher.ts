@@ -30,7 +30,7 @@ function getMatchingReactiveBindings(regex: RegExp, str: string, group: number =
     const matches: string[] = regexMatches(regex, str, group);
 
     return matches.map(match => {
-        const bindingName = match;
+        const bindingName = match.trim();
         const stateName = getBindingNameFromKeyPath(bindingName).trim();
         const stateSubPath = getValuePath(bindingName).trim();
 

@@ -21,7 +21,8 @@ export default class Condition {
 
             if (t.startsWith(BINDING)) {
                 const bindingName: string = t.substring(BINDING.length);
-                const binding: StateBinding | undefined = bindings.find(b => b.stateName === bindingName);
+                const binding: StateBinding | undefined = bindings.find(b => b.binding === bindingName);
+
                 if (binding) {
                     this.bindingsMap.set(bindingName, binding);
                 }

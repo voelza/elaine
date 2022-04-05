@@ -43,7 +43,7 @@ export default class Instance {
     private template: Element;
     private states: Map<string, State<any>> = new Map();
     private methods: Map<string, Function> = new Map();
-    private components: Map<string, Component> = new Map();
+    components: Map<string, Component> = new Map();
     private links: StateLink[] = [];
     private childInstances: Instance[] = [];
 
@@ -116,17 +116,6 @@ export default class Instance {
             this.conditionLink.init();
         }
 
-        if (this.origin === Origin.SETUP) {
-            const css = Array.from(this.components.values())
-                .map(c => c.css)
-                .filter(c => c !== undefined)
-                .reduce((cssAll, css) => cssAll + " " + css, "");
-            if (css) {
-                this.styleElement = document.createElement("style");
-                this.styleElement.textContent = css;
-            }
-        }
-
         this.wasCreated = false;
 
         this.methods.set("$date", dateToDateStr);
@@ -147,7 +136,7 @@ export default class Instance {
         return componentElements.includes(tagName);
     }
 
-    setupIfNeeded(): void {
+    private setupIfNeeded(): void {
         if (this.wasCreated) {
             return;
         }
@@ -172,7 +161,22 @@ export default class Instance {
         }
         this.initComponents([this.template]);
 
+        if (this.origin === Origin.SETUP) {
+            const css = this.gatherAllComponents()
+                .map(c => c.css)
+                .filter(c => c !== undefined)
+                .reduce((cssAll, css) => cssAll + " " + css, "");
+
+            if (css) {
+                this.styleElement = document.createElement("style");
+                this.styleElement.textContent = css;
+            }
+        }
         this.wasCreated = true;
+    }
+
+    private gatherAllComponents(): Component[] {
+        return [...this.components.values(), ...this.childInstances.map(i => i.components.values()).flatMap(c => Array.from(c))];
     }
 
     addLink(link: StateLink): void {
@@ -249,12 +253,12 @@ export default class Instance {
         }
 
         insertAfter(this.template, this.element);
-        if (this.styleElement) {
-            document.body.prepend(this.styleElement);
-        }
         this.element.remove();
         this.setupIfNeeded();
 
+        if (this.styleElement) {
+            document.body.prepend(this.styleElement);
+        }
 
         // was mounted
         if (this.onMounted) {

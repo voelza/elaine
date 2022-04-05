@@ -1,7 +1,6 @@
-import Elaine from "../lib/Elaine";
-import { InstanceState } from "../lib/PublicTypes";
+import ELAINE from "../../../lib/Elaine";
 
-export default Elaine.component({
+const modal = ELAINE.component({
     name: "modal",
     template: `
     <div class="modal">
@@ -52,8 +51,8 @@ export default Elaine.component({
         type: String
     }],
     slots: ["content", "header"],
-    setup: (state: InstanceState) => {
-        const modal: Element = state.element;
+    setup: (state) => {
+        const modal = state.element;
         modal.setAttribute("style", "position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000;");
 
         const backdrop = document.createElement("div");
@@ -80,8 +79,44 @@ export default Elaine.component({
             }
         };
     },
-    onMounted: (state: InstanceState) => {
+    onMounted: (state) => {
         const modal = state.element;
         modal.parentNode?.removeChild(modal);
     }
+});
+
+
+const app = ELAINE.component({
+    name: "app",
+    template: `
+    <div>
+        <button ++click="openModal">Open the Modal</button>
+
+        <modal ref="modal" title="This is a modal!">
+            <header>
+                Yo yo yo yo
+            </header>
+            <content>
+                <h2>@@{~title}</h2>
+            </content>
+        </modal>
+    </div>
+    `,
+    setup: (state) => {
+        const openModal = () => {
+            state.refs.modal.methods.open();
+        };
+
+        return {
+            state: {
+                openModal
+            },
+            components: [modal]
+        }
+    }
+});
+
+ELAINE.setup(document.getElementById("app"), {
+    state: {},
+    components: [app]
 });

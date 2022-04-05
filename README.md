@@ -605,6 +605,10 @@ Beware that at the moment event names are always in lower-case.
 
 ### Random stuff
 
+Wait... there is more!
+
+#### Concat
+
 Sometimes no spaces are allowed in HTML attribute but you don't want to include certain parts of them in your states. You can use the `##` symbol to concatenate them together. So for example instead of writing this:
 ```javascript
 const fontSize = Elaine.state("12px");
@@ -623,4 +627,26 @@ const fontSize = Elaine.state(12);
 Both will become:
 ```html
 <div @@style="fontSize: 12px">Hello World!</div>
+```
+
+#### Template declaration of states
+Sometimes you want to declare new states on the fly within a template. This is useful in loops which don't allow you to call a setup function before the loop generation (yet). Instead you can use the `<template-state>` element within your template. All attributes on this element will be converted into states after the linker has visited this element.
+
+For example:
+```javascript
+const header = {
+    key: "The One To Rule Them All",
+};
+```
+```html
+@@{key}
+<template-state 
+    key="@@header.key"
+></template-state>
+@@{key}
+```
+Will result in:
+```html
+@@{key}
+The One To Rule Them All
 ```

@@ -22,6 +22,7 @@ export enum Origin {
 
 export const SLOT_INDICATOR = "elaine-slot";
 export const SLOT_RESOLVER = "elaine-slot-resolver";
+const SLOT_PARENT_COMPONENT = "elaine-parent-component";
 
 
 function dateToDateStr(date: Date): string {
@@ -141,9 +142,10 @@ export default class Instance {
             return;
         }
 
-        this.resolveSlots(this.element);
         this.resolveProps(this.element, this.parent);
         this.resolveSetup();
+
+        this.resolveSlots(this.element);
 
         // copy over attributes from parent
         for (const elementAttr of Array.from(this.element.attributes)) {
@@ -300,7 +302,7 @@ export default class Instance {
             const variant = slotOnComponent.getAttribute("variant");
             const slotOnElement = element.querySelector(slotName);
             if (slotOnElement) {
-                invertParentCalls(slotOnElement);
+                invertParentCalls(slotOnElement, this.parent?.components);
                 if (variant) {
                     slotOnElement.setAttribute(SLOT_INDICATOR, "");
                     slotOnElement.setAttribute(SLOT_RESOLVER, variant);
@@ -393,7 +395,8 @@ export default class Instance {
     private initComponents(elements: NodeListOf<Node> | Element[]) {
         for (let i = 0; i < elements.length; i++) {
             const element: Element = elements[i] as Element;
-            const componentByThatName: Component | undefined = this.getComponent(element.tagName);
+            const isParentComponent: boolean = element.getAttribute && element.getAttribute(SLOT_PARENT_COMPONENT) !== null;
+            const componentByThatName: Component | undefined = isParentComponent ? this.parent?.getComponent(element.tagName) : this.getComponent(element.tagName);
             if (componentByThatName !== undefined) {
                 const componentInstance: Instance = componentByThatName.toInstance(element, this);
                 this.childInstances.push(componentInstance);
@@ -452,7 +455,11 @@ export default class Instance {
     }
 }
 
-function invertParentCalls(slot: Element) {
+function invertParentCalls(slot: Element, parentComponents: Map<string, Component> | undefined) {
+    if (parentComponents?.get(slot.tagName)) {
+        slot.setAttribute(SLOT_PARENT_COMPONENT, "");
+    }
+
     if (slot instanceof Text && slot.textContent && slot.textContent.length !== 0) {
         const newText = slot.textContent
             .replaceAll(TEXT_STATE_BINDING, (_, g) => BINDING + "{" + invertParentCall(g) + "}")
@@ -473,14 +480,14 @@ function invertParentCalls(slot: Element) {
     }
 
     if (slot.hasChildNodes()) {
-        invertChildrentParentCalls(slot.childNodes);
+        invertChildrentParentCalls(slot.childNodes, parentComponents);
     }
 }
 
-function invertChildrentParentCalls(slotChildren: NodeListOf<Node> | Element[]) {
+function invertChildrentParentCalls(slotChildren: NodeListOf<Node> | Element[], parentComponents: Map<string, Component> | undefined) {
     for (let i = 0; i < slotChildren.length; i++) {
         const element = slotChildren[i];
-        invertParentCalls(element as Element);
+        invertParentCalls(element as Element, parentComponents);
     }
 }
 

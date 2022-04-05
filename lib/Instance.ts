@@ -4,7 +4,7 @@ import { ATTRIBUTE_ELEMENT_STATE_BINDING, BINDING, EVENT_LISTENER_BINDING, TEMPL
 import StateLink from "./links/StateLink";
 import MutableState from "./states/MutableState";
 import ImmutableState from "./states/ImmutableState";
-import Component from "./Component";
+import Component, { COMPONENT_CSS_SCOPE } from "./Component";
 import ComputedState from "./states/ComputedState";
 import { insertAfter, insertBefore } from "./utils/DOM";
 import { link } from "./links/Linker";
@@ -149,6 +149,9 @@ export default class Instance {
 
         // copy over attributes from parent
         for (const elementAttr of Array.from(this.element.attributes)) {
+            if (elementAttr.name.startsWith(COMPONENT_CSS_SCOPE)) {
+                continue;
+            }
             const transferAttr: Attr = elementAttr.cloneNode(true) as Attr;
             this.template.attributes.setNamedItem(transferAttr);
         }

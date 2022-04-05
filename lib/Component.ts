@@ -1,6 +1,8 @@
 import Instance, { Origin } from "./Instance";
 import { InstanceState, Prop, SetupState } from "./PublicTypes";
 
+export const COMPONENT_CSS_SCOPE = "data-elaine-c-";
+
 export default class Component {
     name: string;
     private template: Element;
@@ -37,13 +39,22 @@ export default class Component {
         this.beforeDestroyed = beforeDestroyed;
         this.onDestroyed = onDestroyed;
 
-        const componentDataAttribute = "data-elaine-" + name.toLowerCase();
         if (css) {
+            const componentDataAttribute = COMPONENT_CSS_SCOPE + name.toLowerCase();
             this.css = css.replaceAll(/.*\{/g, (p) => {
                 const selector = p.substring(0, p.length - 1).trim();
-                return `${selector}[${componentDataAttribute}], [${componentDataAttribute}] ${selector} {`
+                return `${selector}[${componentDataAttribute}] {`
             }).replace((/  |\r\n|\n|\r/gm), "");
-            this.template.setAttribute(componentDataAttribute, "");
+            this.addAttributeToAllElements(this.template, componentDataAttribute);
+        }
+    }
+
+    private addAttributeToAllElements(element: Element, attribute: string): void {
+        element.setAttribute(attribute, "");
+        if (element.children.length > 0) {
+            for (const child of Array.from(element.children)) {
+                this.addAttributeToAllElements(child, attribute);
+            }
         }
     }
 

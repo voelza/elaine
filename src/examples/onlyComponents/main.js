@@ -20,7 +20,8 @@ const modal = ELAINE.component({
             border-radius: 5px;
             padding: 5px;
             min-width: 500px;
-            background-color: white;
+            background-color: #efecec;
+            box-shadow: 15px 15px 15px #999393;
         }
         
         .modal-header {
@@ -44,6 +45,9 @@ const modal = ELAINE.component({
             display: flex;
             flex-direction: column;
             gap: 5px;
+            overflow: auto;
+            max-width: 95vw;
+            padding: 5px;
         }
     `,
     props: [{
@@ -82,6 +86,7 @@ const modal = ELAINE.component({
     onMounted: (state) => {
         const modal = state.element;
         modal.parentNode?.removeChild(modal);
+
     }
 });
 
@@ -110,11 +115,10 @@ const TheCarousel = ELAINE.component({
     `,
     css: `
         .carousal {
-            width: 800px;
             display: flex;
             flex-direction: row;
-            align-items: center;
-            justify-content: center;
+            align-items: center;    
+            gap: 10px;
         }
 
         .image-previews {
@@ -143,7 +147,7 @@ const TheCarousel = ELAINE.component({
 
         .display-image {
             width: 800px;
-            height: 500px;
+            max-width: 85vw;
             border: 3px solid white;
             border-radius: 2.5px;
             box-shadow: 5px 5px 5px lightgray;
@@ -162,11 +166,9 @@ const TheCarousel = ELAINE.component({
             background-color: #a09e9e;
         }
 
-        .prev-btn {
-            left: -400px;
-        }
-        .next-btn {
-            left: 400px;
+        p {
+            text-align: center;
+            font-family: monospaced;
         }
     `,
     props: [
@@ -274,6 +276,11 @@ const app = ELAINE.component({
                 src: "https://c8x2z8i6.rocketcdn.me/wp-content/uploads/2020/09/genshin-impact-cover.jpg",
                 alt: "crowded genshin picture",
                 caption: "crowded genshin picture"
+            },
+            {
+                src: "https://pbs.twimg.com/media/FBll6LvVQAQB3Qg?format=jpg&name=4096x4096",
+                alt: "genshin girls",
+                caption: "genshin girls"
             }
         ];
 

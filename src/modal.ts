@@ -21,7 +21,8 @@ export default Elaine.component({
             border-radius: 5px;
             padding: 5px;
             min-width: 500px;
-            background-color: white;
+            background-color: #efecec;
+            box-shadow: 15px 15px 15px #999393;
         }
         
         .modal-header {
@@ -45,6 +46,9 @@ export default Elaine.component({
             display: flex;
             flex-direction: column;
             gap: 5px;
+            overflow: auto;
+            max-width: 95vw;
+            padding: 5px;
         }
     `,
     props: [{

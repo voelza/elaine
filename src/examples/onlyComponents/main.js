@@ -127,7 +127,6 @@ const TheCarousel = ELAINE.component({
             align-items: center;
             gap: 5px;
             justify-content: center;
-            width: 800px;
             flex-wrap: wrap;
         }
 

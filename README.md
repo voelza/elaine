@@ -599,5 +599,28 @@ export default Elaine.component({
 ```
 
 #### Component Events
-Custom component events are binded like normal events. They can be emitted with dispatchEvent("event-name", "payload").
+Custom component events are binded like normal events. They can be emitted with `dispatchEvent("event-name", "payload")`.
 Beware that at the moment event names are always in lower-case.
+
+
+### Random stuff
+
+Sometimes no spaces are allowed in HTML attribute but you don't want to include certain parts of them in your states. You can use the `##` symbol to concatenate them together. So for example instead of writing this:
+```javascript
+const fontSize = Elaine.state("12px");
+```
+```html
+<div @@style="fontSize: @@fontSize">Hello World!</div>
+```
+You could write this:
+```javascript
+const fontSize = Elaine.state(12);
+```
+```html
+<div @@style="fontSize: @@fontSize##px">Hello World!</div>
+```
+
+Both will become:
+```html
+<div @@style="fontSize: 12px">Hello World!</div>
+```

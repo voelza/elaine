@@ -1351,7 +1351,7 @@ class Instance {
     }
     insertAfter(this.template, this.element);
     if (this.styleElement) {
-      insertAfter(this.styleElement, this.element);
+      document.body.prepend(this.styleElement);
     }
     this.element.remove();
     this.setupIfNeeded();

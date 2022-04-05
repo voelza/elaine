@@ -1179,6 +1179,7 @@ var Origin = /* @__PURE__ */ ((Origin2) => {
 })(Origin || {});
 const SLOT_INDICATOR = "elaine-slot";
 const SLOT_RESOLVER = "elaine-slot-resolver";
+const SLOT_PARENT_COMPONENT = "elaine-parent-component";
 function dateToDateStr(date) {
   return date.toLocaleDateString();
 }
@@ -1267,10 +1268,13 @@ class Instance {
     if (this.wasCreated) {
       return;
     }
-    this.resolveSlots(this.element);
     this.resolveProps(this.element, this.parent);
     this.resolveSetup();
+    this.resolveSlots(this.element);
     for (const elementAttr of Array.from(this.element.attributes)) {
+      if (elementAttr.name.startsWith(COMPONENT_CSS_SCOPE)) {
+        continue;
+      }
       const transferAttr = elementAttr.cloneNode(true);
       this.template.attributes.setNamedItem(transferAttr);
     }
@@ -1382,6 +1386,7 @@ class Instance {
     return new Condition(condition, bindings);
   }
   resolveSlots(element) {
+    var _a;
     for (const slotName of this.slots) {
       const slotOnComponent = this.template.querySelector(slotName);
       if (!slotOnComponent) {
@@ -1390,7 +1395,7 @@ class Instance {
       const variant = slotOnComponent.getAttribute("variant");
       const slotOnElement = element.querySelector(slotName);
       if (slotOnElement) {
-        invertParentCalls(slotOnElement);
+        invertParentCalls(slotOnElement, (_a = this.parent) == null ? void 0 : _a.components);
         if (variant) {
           slotOnElement.setAttribute(SLOT_INDICATOR, "");
           slotOnElement.setAttribute(SLOT_RESOLVER, variant);
@@ -1473,9 +1478,11 @@ class Instance {
     }
   }
   initComponents(elements) {
+    var _a;
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i];
-      const componentByThatName = this.getComponent(element.tagName);
+      const isParentComponent = element.getAttribute && element.getAttribute(SLOT_PARENT_COMPONENT) !== null;
+      const componentByThatName = isParentComponent ? (_a = this.parent) == null ? void 0 : _a.getComponent(element.tagName) : this.getComponent(element.tagName);
       if (componentByThatName !== void 0) {
         const componentInstance = componentByThatName.toInstance(element, this);
         this.childInstances.push(componentInstance);
@@ -1525,7 +1532,10 @@ class Instance {
     }
   }
 }
-function invertParentCalls(slot) {
+function invertParentCalls(slot, parentComponents) {
+  if (parentComponents == null ? void 0 : parentComponents.get(slot.tagName)) {
+    slot.setAttribute(SLOT_PARENT_COMPONENT, "");
+  }
   if (slot instanceof Text && slot.textContent && slot.textContent.length !== 0) {
     const newText = slot.textContent.replaceAll(TEXT_STATE_BINDING, (_, g) => BINDING + "{" + invertParentCall(g) + "}").replaceAll(ATTRIBUTE_ELEMENT_STATE_BINDING, (_, a) => BINDING + invertParentCall(a));
     slot.textContent = newText;
@@ -1541,18 +1551,19 @@ function invertParentCalls(slot) {
     }
   }
   if (slot.hasChildNodes()) {
-    invertChildrentParentCalls(slot.childNodes);
+    invertChildrentParentCalls(slot.childNodes, parentComponents);
   }
 }
-function invertChildrentParentCalls(slotChildren) {
+function invertChildrentParentCalls(slotChildren, parentComponents) {
   for (let i = 0; i < slotChildren.length; i++) {
     const element = slotChildren[i];
-    invertParentCalls(element);
+    invertParentCalls(element, parentComponents);
   }
 }
 function invertParentCall(template) {
   return template.startsWith(TEMPLATE_PARENT_CALL) ? template.substring(TEMPLATE_PARENT_CALL.length) : TEMPLATE_PARENT_CALL + template;
 }
+const COMPONENT_CSS_SCOPE = "data-elaine-c-";
 class Component {
   constructor(name, element, props = [], slots = [], setup2 = void 0, onMounted = void 0, beforeUnmounted = void 0, onUnmounted = void 0, beforeDestroyed = void 0, onDestroyed = void 0, css = void 0) {
     __publicField(this, "name");
@@ -1576,13 +1587,21 @@ class Component {
     this.onUnmounted = onUnmounted;
     this.beforeDestroyed = beforeDestroyed;
     this.onDestroyed = onDestroyed;
-    const componentDataAttribute = "data-elaine-" + name.toLowerCase();
     if (css) {
+      const componentDataAttribute = COMPONENT_CSS_SCOPE + name.toLowerCase();
       this.css = css.replaceAll(/.*\{/g, (p) => {
         const selector = p.substring(0, p.length - 1).trim();
-        return `${selector}[${componentDataAttribute}], [${componentDataAttribute}] ${selector} {`;
+        return `${selector}[${componentDataAttribute}] {`;
       }).replace(/  |\r\n|\n|\r/gm, "");
-      this.template.setAttribute(componentDataAttribute, "");
+      this.addAttributeToAllElements(this.template, componentDataAttribute);
+    }
+  }
+  addAttributeToAllElements(element, attribute) {
+    element.setAttribute(attribute, "");
+    if (element.children.length > 0) {
+      for (const child of Array.from(element.children)) {
+        this.addAttributeToAllElements(child, attribute);
+      }
     }
   }
   toInstance(element, parent) {

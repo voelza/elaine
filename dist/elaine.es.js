@@ -1247,13 +1247,6 @@ class Instance {
       this.conditionLink = new Renderlink(element, this.condition.getBindings(), this.condition, void 0, this);
       this.conditionLink.init();
     }
-    if (this.origin === 0) {
-      const css = Array.from(this.components.values()).map((c) => c.css).filter((c) => c !== void 0).reduce((cssAll, css2) => cssAll + " " + css2, "");
-      if (css) {
-        this.styleElement = document.createElement("style");
-        this.styleElement.textContent = css;
-      }
-    }
     this.wasCreated = false;
     this.methods.set("$date", dateToDateStr);
     this.methods.set("$time", dateToTimeStr);
@@ -1286,7 +1279,17 @@ class Instance {
       link2.init();
     }
     this.initComponents([this.template]);
+    if (this.origin === 0) {
+      const css = this.gatherAllComponents().map((c) => c.css).filter((c) => c !== void 0).reduce((cssAll, css2) => cssAll + " " + css2, "");
+      if (css) {
+        this.styleElement = document.createElement("style");
+        this.styleElement.textContent = css;
+      }
+    }
     this.wasCreated = true;
+  }
+  gatherAllComponents() {
+    return [...this.components.values(), ...this.childInstances.map((i) => i.components.values()).flatMap((c) => Array.from(c))];
   }
   addLink(link2) {
     this.links.push(link2);
@@ -1350,11 +1353,11 @@ class Instance {
       return;
     }
     insertAfter(this.template, this.element);
+    this.element.remove();
+    this.setupIfNeeded();
     if (this.styleElement) {
       document.body.prepend(this.styleElement);
     }
-    this.element.remove();
-    this.setupIfNeeded();
     if (this.onMounted) {
       this.onMounted(this.internalState);
     }

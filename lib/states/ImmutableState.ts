@@ -29,10 +29,6 @@ export default class ImmutableState implements State<any> {
         }
     }
 
-    addWatcher(): void {
-        // do nothing
-    }
-
     notify(): void {
         // do nothing
     }

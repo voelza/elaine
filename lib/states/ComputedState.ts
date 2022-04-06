@@ -8,7 +8,6 @@ export default class ComputedState<T> implements StateLink, ComputedState<T>, St
     private parents: State<any>[] = [];
 
     private subscribers: StateLink[] = [];
-    private watchers: (() => void)[] = [];
 
     constructor(computer: () => T, parents: State<any>[]) {
         this.computer = computer;
@@ -33,10 +32,6 @@ export default class ComputedState<T> implements StateLink, ComputedState<T>, St
     notify(): void {
         for (const subscriber of this.subscribers) {
             subscriber.update();
-        }
-
-        for (const watcher of this.watchers) {
-            watcher();
         }
     }
 
@@ -63,9 +58,5 @@ export default class ComputedState<T> implements StateLink, ComputedState<T>, St
         if (index !== -1) {
             this.subscribers.splice(index, 1);
         }
-    }
-
-    addWatcher(watcher: () => void): void {
-        this.watchers.push(watcher);
     }
 }

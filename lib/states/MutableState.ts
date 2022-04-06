@@ -4,7 +4,6 @@ import State from "./State";
 export default class MutableState implements State<any> {
     private _value: any;
     private subscribers: StateLink[] = [];
-    private watchers: (() => void)[] = [];
 
     constructor(value: any) {
         this._value = value;
@@ -73,17 +72,9 @@ export default class MutableState implements State<any> {
         }
     }
 
-    addWatcher(watcher: () => void): void {
-        this.watchers.push(watcher);
-    }
-
     notify(): void {
         for (const subscriber of this.subscribers) {
             subscriber.update();
-        }
-
-        for (const watcher of this.watchers) {
-            watcher();
         }
     }
 }

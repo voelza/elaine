@@ -7,5 +7,4 @@ export default interface State<T> {
     subscribe(subscriber: StateLink): void;
     unsubscribe(subscriber: StateLink): void;
     notify(): void;
-    addWatcher(watcher: () => void): void;
 }

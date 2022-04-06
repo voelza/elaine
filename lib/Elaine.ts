@@ -1,5 +1,6 @@
 import Component from "./Component";
 import Instance, { Origin } from "./Instance";
+import WatcherLink from "./links/WatcherLink";
 import { ComponentData, InstanceState, SetupState } from "./PublicTypes";
 import ComputedState from "./states/ComputedState";
 import MutableState from "./states/MutableState";
@@ -79,8 +80,9 @@ function state<T>(value: T): State<T> {
 }
 
 function watch(watcher: () => void, ...states: State<any>[]): void {
-    for (const reactive of states) {
-        reactive.addWatcher(watcher);
+    const watcherLink: WatcherLink = new WatcherLink(watcher, ...states);
+    for (const state of states) {
+        state.subscribe(watcherLink);
     }
 }
 

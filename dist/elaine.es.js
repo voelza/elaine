@@ -186,7 +186,6 @@ class MutableState {
   constructor(value) {
     __publicField(this, "_value");
     __publicField(this, "subscribers", []);
-    __publicField(this, "watchers", []);
     this._value = value;
     if (this._value instanceof Array) {
       this._value = new Proxy(this._value, {
@@ -241,15 +240,9 @@ class MutableState {
       this.subscribers.splice(index, 1);
     }
   }
-  addWatcher(watcher) {
-    this.watchers.push(watcher);
-  }
   notify() {
     for (const subscriber of this.subscribers) {
       subscriber.update();
-    }
-    for (const watcher of this.watchers) {
-      watcher();
     }
   }
 }
@@ -272,8 +265,6 @@ class ImmutableState {
       this.subscribers.splice(index, 1);
     }
   }
-  addWatcher() {
-  }
   notify() {
   }
 }
@@ -283,7 +274,6 @@ class ComputedState {
     __publicField(this, "computer");
     __publicField(this, "parents", []);
     __publicField(this, "subscribers", []);
-    __publicField(this, "watchers", []);
     this.computer = computer;
     this.value = this.computer();
     this.parents = parents;
@@ -303,9 +293,6 @@ class ComputedState {
     for (const subscriber of this.subscribers) {
       subscriber.update();
     }
-    for (const watcher of this.watchers) {
-      watcher();
-    }
   }
   notifyParents() {
     for (const parent of this.parents) {
@@ -324,9 +311,6 @@ class ComputedState {
     if (index !== -1) {
       this.subscribers.splice(index, 1);
     }
-  }
-  addWatcher(watcher) {
-    this.watchers.push(watcher);
   }
 }
 function insertAfter(newNode, referenceNode) {
@@ -1170,6 +1154,108 @@ function resolveSlots(instance, element, parent) {
   }
   element.remove();
 }
+class EventHubInstance {
+  constructor() {
+    __publicField(this, "listeners", /* @__PURE__ */ new Map());
+  }
+  dispatchEvent(eventName, payload) {
+    var _a;
+    for (const listener of (_a = this.listeners.get(eventName)) != null ? _a : []) {
+      listener(payload);
+    }
+  }
+  addListener({ eventName, listener }) {
+    let eventListeners = this.listeners.get(eventName);
+    if (eventListeners === void 0) {
+      eventListeners = [];
+    }
+    eventListeners.push(listener);
+    this.listeners.set(eventName, eventListeners);
+  }
+  removeListener({ eventName, listener }) {
+    const eventListeners = this.listeners.get(eventName);
+    if (eventListeners === void 0) {
+      return;
+    }
+    const indexOfListener = eventListeners.indexOf(listener);
+    if (indexOfListener !== -1) {
+      eventListeners.splice(eventListeners.indexOf(listener), 1);
+    }
+  }
+}
+var EventHub = new EventHubInstance();
+class StoreInstance {
+  constructor(notify) {
+    __publicField(this, "notify");
+    this.notify = notify;
+  }
+  add(states) {
+    for (const name of Object.keys(states)) {
+      let state2 = states[name];
+      if (!(state2 instanceof MutableState) && !(state2 instanceof ComputedState) && !(state2 instanceof ImmutableState)) {
+        state2 = new ImmutableState(state2);
+      }
+      this["_" + name] = state2;
+      Object.defineProperty(this, name, {
+        get: () => {
+          return state2.value;
+        },
+        set: (value) => {
+          state2.value = value;
+          this.notify();
+        }
+      });
+    }
+  }
+  watch(property, watcher) {
+    const state2 = this["_" + property];
+    if (state2) {
+      Elaine.watch(() => {
+        watcher(state2.value);
+      }, state2);
+    }
+  }
+}
+function createTriggerNotify(subscribers) {
+  return () => {
+    for (const subscriber of subscribers) {
+      subscriber.update();
+    }
+  };
+}
+class StoreState {
+  constructor() {
+    __publicField(this, "_value");
+    __publicField(this, "subscribers");
+    __publicField(this, "triggerNotify");
+    this.subscribers = [];
+    this.triggerNotify = createTriggerNotify(this.subscribers);
+    this._value = new StoreInstance(this.triggerNotify);
+  }
+  set value(_) {
+    throw "Not allowed to change Store value";
+  }
+  get value() {
+    return this._value;
+  }
+  set() {
+  }
+  setPathValue() {
+  }
+  subscribe(subscriber) {
+    this.subscribers.push(subscriber);
+  }
+  unsubscribe(subscriber) {
+    const index = this.subscribers.indexOf(subscriber);
+    if (index !== -1) {
+      this.subscribers.splice(index, 1);
+    }
+  }
+  notify() {
+    this.triggerNotify();
+  }
+}
+var Store = new StoreState();
 var Origin = /* @__PURE__ */ ((Origin2) => {
   Origin2[Origin2["SETUP"] = 0] = "SETUP";
   Origin2[Origin2["COMPONENT"] = 1] = "COMPONENT";
@@ -1214,6 +1300,9 @@ class Instance {
     __publicField(this, "internalState");
     __publicField(this, "wasCreated");
     __publicField(this, "dispatchEvent");
+    __publicField(this, "globalEventListeners", []);
+    __publicField(this, "dispatchGlobalEvent");
+    __publicField(this, "addGlobalEventListener");
     __publicField(this, "styleElement");
     this.origin = origin;
     this.element = element;
@@ -1236,12 +1325,23 @@ class Instance {
       });
       this.template.dispatchEvent(event);
     };
+    this.dispatchGlobalEvent = (eventName, payload) => {
+      EventHub.dispatchEvent(eventName, payload);
+    };
+    this.addGlobalEventListener = (eventName, listener) => {
+      const globalEventListener = { eventName, listener };
+      EventHub.addListener(globalEventListener);
+      this.globalEventListeners.push(globalEventListener);
+    };
     this.internalState = {
       element: this.template,
       data: {},
       methods: {},
       refs: {},
-      dispatchEvent: this.dispatchEvent
+      $store: Store.value,
+      dispatchEvent: this.dispatchEvent,
+      dispatchGlobalEvent: this.dispatchGlobalEvent,
+      addGlobalEventListener: this.addGlobalEventListener
     };
     this.condition = this.extractCondition(element);
     if (this.condition) {
@@ -1252,6 +1352,7 @@ class Instance {
     this.methods.set("$date", dateToDateStr);
     this.methods.set("$time", dateToTimeStr);
     this.methods.set("$dateTime", dateToDateTimeStr);
+    this.states.set("$store", Store);
     if (this.components.size > 0) {
       for (const component2 of this.components.values()) {
         componentElements.push(component2.name);
@@ -1454,6 +1555,7 @@ class Instance {
     return value;
   }
   resolveSetup() {
+    var _a;
     if (!this.setup) {
       return;
     }
@@ -1462,7 +1564,7 @@ class Instance {
       for (const component2 of setupResult.components || []) {
         this.registerComponent(component2.name, component2);
       }
-      for (const propName in setupResult.state) {
+      for (const propName in (_a = setupResult.state) != null ? _a : {}) {
         const state2 = setupResult.state[propName];
         if (state2 instanceof Function) {
           this.methods.set(propName, state2);
@@ -1527,6 +1629,10 @@ class Instance {
       link2.destroy();
     }
     (_a = this.conditionLink) == null ? void 0 : _a.destroy();
+    for (const globalEventListener of this.globalEventListeners) {
+      EventHub.removeListener(globalEventListener);
+    }
+    this.globalEventListeners = [];
     if (this.onDestroyed) {
       this.onDestroyed(this.internalState);
     }
@@ -1608,6 +1714,24 @@ class Component {
     return new Instance(Origin.COMPONENT, element, this.template, parent, this.props, this.slots, this.setup, this.onMounted, this.beforeUnmounted, this.onUnmounted, this.beforeDestroyed, this.onDestroyed);
   }
 }
+class WatcherLink {
+  constructor(watcher, ...states) {
+    __publicField(this, "watcher");
+    __publicField(this, "states");
+    this.watcher = watcher;
+    this.states = states;
+  }
+  init() {
+  }
+  update() {
+    this.watcher();
+  }
+  destroy() {
+    for (const state2 of this.states) {
+      state2.unsubscribe(this);
+    }
+  }
+}
 Object.defineProperty(Object.prototype, "setValueForKey", {
   value: function(value, key) {
     this[key] = value;
@@ -1662,8 +1786,9 @@ function state(value) {
   return new MutableState(value);
 }
 function watch(watcher, ...states) {
-  for (const reactive of states) {
-    reactive.addWatcher(watcher);
+  const watcherLink = new WatcherLink(watcher, ...states);
+  for (const state2 of states) {
+    state2.subscribe(watcherLink);
   }
 }
 function computed(computer, ...states) {
@@ -1684,11 +1809,19 @@ function component(componentData) {
   const element = typeof componentData.template === "string" ? templateToElement(componentData.template) : componentData.template;
   return new Component(name, element, componentData.props, componentData.slots, componentData.setup, componentData.onMounted, componentData.beforeUnmounted, componentData.onUnmounted, componentData.beforeDestroyed, componentData.onDestroyed, componentData.css);
 }
+function eventHub() {
+  return EventHub;
+}
+function store() {
+  return Store.value;
+}
 var Elaine = {
   setup,
   state,
   watch,
   computed,
-  component
+  component,
+  eventHub,
+  store
 };
 export { Elaine as default };

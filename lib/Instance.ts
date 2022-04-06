@@ -13,7 +13,6 @@ import { StateBinding } from "./states/StateBinding";
 import { retrieveBindings } from "./utils/RegexMatcher";
 import RenderLink from "./links/RenderLink";
 import EventHub, { GlobalEventListener } from "./EventHub";
-import StoreInstance from "./Store";
 import Store from "./Store";
 
 export enum Origin {

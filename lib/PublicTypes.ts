@@ -29,7 +29,9 @@ export type InstanceState = {
     data: any,
     methods: any,
     refs: any,
-    dispatchEvent: (eventName: string, payload: any | undefined) => void
+    dispatchEvent: (eventName: string, payload: any | undefined) => void,
+    dispatchGlobalEvent: (eventName: string, payload: any) => void,
+    listenToGlobalEvent: (eventName: string, listener: (payload: any) => void) => void
 };
 
 export interface ComputedState<T> {

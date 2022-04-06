@@ -12,6 +12,7 @@ import { InstanceState, Prop, SetupState } from "./PublicTypes";
 import { StateBinding } from "./states/StateBinding";
 import { retrieveBindings } from "./utils/RegexMatcher";
 import RenderLink from "./links/RenderLink";
+import EventHub, { GlobalEventListener } from "./EventHub";
 
 export enum Origin {
     SETUP,
@@ -64,6 +65,10 @@ export default class Instance {
     private wasCreated: boolean;
     private dispatchEvent: (eventName: string, payload: any) => void;
 
+    private globalEventListeners: GlobalEventListener[] = [];
+    private dispatchGlobalEvent: (eventName: string, payload: any) => void;
+    private listenToGlobalEvent: (eventName: string, listener: (payload: any) => void) => void;
+
     private styleElement: Element | undefined;
 
     constructor(
@@ -103,12 +108,23 @@ export default class Instance {
             });
             this.template.dispatchEvent(event);
         }
+        this.dispatchGlobalEvent = (eventName: string, payload: any): void => {
+            EventHub.dispatchEvent(eventName, payload);
+        };
+        this.listenToGlobalEvent = (eventName: string, listener: (payload: any) => void) => {
+            const globalEventListener: GlobalEventListener = { eventName, listener };
+            EventHub.subscribe(globalEventListener);
+            this.globalEventListeners.push(globalEventListener);
+        };
+
         this.internalState = {
             element: this.template,
             data: {},
             methods: {},
             refs: {},
-            dispatchEvent: this.dispatchEvent
+            dispatchEvent: this.dispatchEvent,
+            dispatchGlobalEvent: this.dispatchGlobalEvent,
+            listenToGlobalEvent: this.listenToGlobalEvent
         };
 
         this.condition = this.extractCondition(element);
@@ -451,6 +467,11 @@ export default class Instance {
             link.destroy();
         }
         this.conditionLink?.destroy();
+
+        for (const globalEventListener of this.globalEventListeners) {
+            EventHub.unscubribe(globalEventListener);
+        }
+        this.globalEventListeners = [];
 
         if (this.onDestroyed) {
             this.onDestroyed(this.internalState);

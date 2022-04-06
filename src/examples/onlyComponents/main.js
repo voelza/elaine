@@ -50,10 +50,16 @@ const modal = ELAINE.component({
             padding: 5px;
         }
     `,
-    props: [{
-        name: "title",
-        type: String
-    }],
+    props: [
+        {
+            name: "title",
+            type: String
+        },
+        {
+            name: "modalid",
+            type: String
+        }
+    ],
     slots: ["content", "header"],
     setup: (state) => {
         const modal = state.element;
@@ -73,12 +79,13 @@ const modal = ELAINE.component({
             document.body.appendChild(modal);
         };
 
+        state.listenToGlobalEvent(`openmodal${state.data.modalid.value}`, open);
+
         backdrop.addEventListener("click", close);
 
         return {
             state: {
                 close,
-                open,
                 backdrop
             }
         };
@@ -224,12 +231,20 @@ const app = ELAINE.component({
     <div>
         <button ++click="openModal">Open the Modal</button>
 
-        <modal ref="modal" title="This is a modal!">
+        <modal title="This is a modal!" modalid="@@modalid">
             <header>
                 Yo yo yo yo
             </header>
             <content>
                 <TheCarousel images="@@images" class="carousal"></TheCarousel>
+            </content>
+        </modal>
+
+        <button ++click="openDifferentModal">Open the Differnt Modal</button>
+
+        <modal title="This is a different modal!" modalid="@@modalid2">
+            <content>
+                This is a different modal!
             </content>
         </modal>
 
@@ -246,8 +261,15 @@ const app = ELAINE.component({
         }
     `,
     setup: (state) => {
+
+        const modalid = "carouselModal";
         const openModal = () => {
-            state.refs.modal.methods.open();
+            state.dispatchGlobalEvent(`openmodal${modalid}`);
+        };
+
+        const modalid2 = "modalid2";
+        const openDifferentModal = () => {
+            state.dispatchGlobalEvent(`openmodal${modalid2}`);
         };
 
         const images = [
@@ -286,7 +308,10 @@ const app = ELAINE.component({
         return {
             state: {
                 openModal,
-                images
+                images,
+                modalid,
+                modalid2,
+                openDifferentModal
             },
             components: [modal, TheCarousel]
         }

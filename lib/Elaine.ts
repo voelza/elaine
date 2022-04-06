@@ -1,4 +1,5 @@
 import Component from "./Component";
+import EventHub, { EventHubInstance } from "./EventHub";
 import Instance, { Origin } from "./Instance";
 import WatcherLink from "./links/WatcherLink";
 import { ComponentData, InstanceState, SetupState } from "./PublicTypes";
@@ -119,10 +120,15 @@ function component(componentData: ComponentData): Component {
     );
 }
 
+function eventHub(): EventHubInstance {
+    return EventHub;
+}
+
 export default {
     setup,
     state,
     watch,
     computed,
-    component
+    component,
+    eventHub
 };

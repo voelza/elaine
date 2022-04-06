@@ -243,7 +243,9 @@ export type InstanceState = {
     data: any,
     methods: any,
     refs: any,
-    dispatchEvent: (eventName: string, payload: any | undefined) => void
+    dispatchEvent: (eventName: string, payload: any | undefined) => void,
+    dispatchGlobalEvent: (eventName: string, payload: any) => void,
+    addGlobalEventListener: (eventName: string, listener: (payload: any) => void) => void
 };
 ```
 
@@ -252,6 +254,8 @@ Within `data` you have access to all the declared states of the instance.
 With `methods` you can access all the passed methods of the instance.
 With `refs` you can access underlining child-component-instances which you annotated with the `ref="name"` attribute in your template. 
 With `dispatchEvent` you can emit DOM events from your top-level template element which can be used to communicate back to the parent component.
+With `dispatchGlobalEvent` you can emit global application events which can be listened on (see [EventHub](#EventHub)).
+With `addGlobalEventListener` add a listener to the global [EventHub](#EventHub).
 
 This can be used to build a modal-dialog component like this:
 
@@ -603,6 +607,30 @@ Custom component events are binded like normal events. They can be emitted with 
 Beware that at the moment event names are always in lower-case.
 
 
+### Refs on Components
+Sometimes it is necessary to interact with the state of a child-component. To achieve this you can annotate the component with a `ref` attribute and give it a name. On every life-cycle-method you have the ability to get the internal states of theses underlining components by refering to them by their ref-name like this:
+```html
+<modal ref="usefulName" title="Modal">
+      <content>
+          Content of Modal
+      </content>
+</modal>
+```
+```javascript
+setup: (state: InstanceState) => {
+    const openModal = () => {
+        state.refs.usefulName.methods.open();
+    };
+
+    return {
+        state: {
+            openModal
+        }
+    }
+}
+```
+
+
 ### Random stuff
 
 Wait... there is more!
@@ -649,4 +677,42 @@ Will result in:
 ```html
 @@{key}
 The One To Rule Them All
+```
+
+## EventHub 
+There is a global `EventHub` to dispatch events (with payloads) and listen to them. You have access to these in every life-cycle hook by calling the `dispatchGlobalEvent` method and the `addGlobalEventListener` method on the given internal instance state.
+
+These can be used like this on the Modal Component example:
+```javascript
+setup: (state) => {
+        const open = (payload) => {
+            console.log(payload);
+
+            document.body.appendChild(backdrop);
+            document.body.appendChild(modal);
+        };
+
+        state.addGlobalEventListener(`openmodal`, open);
+``` 
+
+And like this to trigger the global event:
+```javascript
+setup: (state) => {
+    const openModal = () => {
+        state.dispatchGlobalEvent(`openmodal`, {data: "anyPayload"});
+    };
+```
+
+Global listeners which were registered by the `addGlobalEventListener` method of the internal state will automatically be removed after the instance was destroyed. If you want to use the `EventHub` outside life-cycle-methods you can use the `eventHub` function to fetch the global `EventHubInstance`. This would work pretty much the same but beware that the listeners are not automatically removed but you would have to call the method `removeListener` on the `EventHubInstance` yourself.
+```javascript
+const eventHub = Elaine.eventHub();
+const listener = (payload) => {
+    console.log(payload);
+};
+
+eventHub.addListener("openModal", listener);
+
+evenHub.dispatchEvent("openModal", {data: "anyPayload"});
+
+eventHub.removeListener("openModal", listener);
 ```

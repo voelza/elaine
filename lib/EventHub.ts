@@ -13,7 +13,7 @@ export class EventHubInstance {
         }
     }
 
-    subscribe({ eventName, listener }: GlobalEventListener) {
+    addListener({ eventName, listener }: GlobalEventListener) {
         let eventListeners = this.listeners.get(eventName);
         if (eventListeners === undefined) {
             eventListeners = [];
@@ -22,7 +22,7 @@ export class EventHubInstance {
         this.listeners.set(eventName, eventListeners);
     }
 
-    unscubribe({ eventName, listener }: GlobalEventListener) {
+    removeListener({ eventName, listener }: GlobalEventListener) {
         const eventListeners = this.listeners.get(eventName);
         if (eventListeners === undefined) {
             return;

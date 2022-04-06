@@ -67,7 +67,7 @@ export default class Instance {
 
     private globalEventListeners: GlobalEventListener[] = [];
     private dispatchGlobalEvent: (eventName: string, payload: any) => void;
-    private listenToGlobalEvent: (eventName: string, listener: (payload: any) => void) => void;
+    private addGlobalEventListener: (eventName: string, listener: (payload: any) => void) => void;
 
     private styleElement: Element | undefined;
 
@@ -111,9 +111,9 @@ export default class Instance {
         this.dispatchGlobalEvent = (eventName: string, payload: any): void => {
             EventHub.dispatchEvent(eventName, payload);
         };
-        this.listenToGlobalEvent = (eventName: string, listener: (payload: any) => void) => {
+        this.addGlobalEventListener = (eventName: string, listener: (payload: any) => void) => {
             const globalEventListener: GlobalEventListener = { eventName, listener };
-            EventHub.subscribe(globalEventListener);
+            EventHub.addListener(globalEventListener);
             this.globalEventListeners.push(globalEventListener);
         };
 
@@ -124,7 +124,7 @@ export default class Instance {
             refs: {},
             dispatchEvent: this.dispatchEvent,
             dispatchGlobalEvent: this.dispatchGlobalEvent,
-            listenToGlobalEvent: this.listenToGlobalEvent
+            addGlobalEventListener: this.addGlobalEventListener
         };
 
         this.condition = this.extractCondition(element);
@@ -469,7 +469,7 @@ export default class Instance {
         this.conditionLink?.destroy();
 
         for (const globalEventListener of this.globalEventListeners) {
-            EventHub.unscubribe(globalEventListener);
+            EventHub.removeListener(globalEventListener);
         }
         this.globalEventListeners = [];
 

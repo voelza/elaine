@@ -79,7 +79,7 @@ const modal = ELAINE.component({
             document.body.appendChild(modal);
         };
 
-        state.listenToGlobalEvent(`openmodal${state.data.modalid.value}`, open);
+        state.addGlobalEventListener(`openmodal${state.data.modalid.value}`, open);
 
         backdrop.addEventListener("click", close);
 

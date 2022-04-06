@@ -1,7 +1,8 @@
 import Component from "./Component";
+import { StoreInstance } from "./Store";
 
 export type SetupState = {
-    state: any | undefined;
+    state?: any | undefined;
     onMounted?: (state: InstanceState) => void;
     beforeUnmounted?: (state: InstanceState) => void;
     onUnmounted?: (state: InstanceState) => void;
@@ -29,6 +30,7 @@ export type InstanceState = {
     data: any,
     methods: any,
     refs: any,
+    $store: StoreInstance,
     dispatchEvent: (eventName: string, payload: any | undefined) => void,
     dispatchGlobalEvent: (eventName: string, payload: any) => void,
     addGlobalEventListener: (eventName: string, listener: (payload: any) => void) => void

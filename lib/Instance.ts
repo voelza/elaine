@@ -13,6 +13,8 @@ import { StateBinding } from "./states/StateBinding";
 import { retrieveBindings } from "./utils/RegexMatcher";
 import RenderLink from "./links/RenderLink";
 import EventHub, { GlobalEventListener } from "./EventHub";
+import StoreInstance from "./Store";
+import Store from "./Store";
 
 export enum Origin {
     SETUP,
@@ -122,6 +124,7 @@ export default class Instance {
             data: {},
             methods: {},
             refs: {},
+            $store: Store.value,
             dispatchEvent: this.dispatchEvent,
             dispatchGlobalEvent: this.dispatchGlobalEvent,
             addGlobalEventListener: this.addGlobalEventListener
@@ -138,6 +141,8 @@ export default class Instance {
         this.methods.set("$date", dateToDateStr);
         this.methods.set("$time", dateToTimeStr);
         this.methods.set("$dateTime", dateToDateTimeStr);
+
+        this.states.set("$store", Store);
 
         if (this.components.size > 0) {
             for (const component of this.components.values()) {
@@ -395,7 +400,7 @@ export default class Instance {
                 this.registerComponent(component.name, component);
             }
 
-            for (const propName in setupResult.state) {
+            for (const propName in setupResult.state ?? {}) {
                 const state = setupResult.state[propName];
                 if (state instanceof Function) {
                     this.methods.set(propName, state);

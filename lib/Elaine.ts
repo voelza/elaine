@@ -6,6 +6,7 @@ import { ComponentData, InstanceState, SetupState } from "./PublicTypes";
 import ComputedState from "./states/ComputedState";
 import MutableState from "./states/MutableState";
 import State from "./states/State";
+import Store, { StoreInstance } from "./Store";
 
 Object.defineProperty(Object.prototype, "setValueForKey", {
     value: function (value: any, key: string) { this[key] = value; }
@@ -124,11 +125,16 @@ function eventHub(): EventHubInstance {
     return EventHub;
 }
 
+function store(): StoreInstance {
+    return Store.value;
+}
+
 export default {
     setup,
     state,
     watch,
     computed,
     component,
-    eventHub
+    eventHub,
+    store
 };

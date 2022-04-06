@@ -16,11 +16,10 @@ const component = Elaine.component({
     <div>
         Counter in Component: @@{$store.counter}
         <button ++click="count">Count</button>
-        <test></test>
+        <test @@style="font-size: @@$store.constant##px;"></test>
     </div>
     `,
     setup: (state) => {
-
         const count = () => {
             // @ts-ignore
             state.$store.counter++;
@@ -43,7 +42,8 @@ const component = Elaine.component({
 const store = Elaine.store();
 const counter = Elaine.state(0);
 const counterDoubled = Elaine.state(0);
-store.add({ counter, counterDoubled });
+const constant = 20;
+store.add({ counter, counterDoubled, constant });
 store.watch("counter", (c) => {
     counterDoubled.value = c * 2;
 });

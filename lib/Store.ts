@@ -1,5 +1,8 @@
 import Elaine from "./Elaine";
 import StateLink from "./links/StateLink";
+import ComputedState from "./states/ComputedState";
+import ImmutableState from "./states/ImmutableState";
+import MutableState from "./states/MutableState";
 import State from "./states/State";
 
 export class StoreInstance {
@@ -12,7 +15,10 @@ export class StoreInstance {
 
     add(states: any): void {
         for (const name of Object.keys(states)) {
-            const state: State<any> = states[name];
+            let state: any = states[name];
+            if (!(state instanceof MutableState) && !(state instanceof ComputedState) && !(state instanceof ImmutableState)) {
+                state = new ImmutableState(state);
+            }
             // @ts-ignore: Unreachable code error
             this["_" + name] = state;
             Object.defineProperty(this, name, {

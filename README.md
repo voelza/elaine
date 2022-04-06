@@ -243,6 +243,7 @@ export type InstanceState = {
     data: any,
     methods: any,
     refs: any,
+    $store: StoreInstance,
     dispatchEvent: (eventName: string, payload: any | undefined) => void,
     dispatchGlobalEvent: (eventName: string, payload: any) => void,
     addGlobalEventListener: (eventName: string, listener: (payload: any) => void) => void
@@ -253,6 +254,7 @@ With `element` you have access to the top-level element of your template within 
 Within `data` you have access to all the declared states of the instance.
 With `methods` you can access all the passed methods of the instance.
 With `refs` you can access underlining child-component-instances which you annotated with the `ref="name"` attribute in your template. 
+Within `$store` you have access to the global store. For more informations see [Global Store](#global-store)
 With `dispatchEvent` you can emit DOM events from your top-level template element which can be used to communicate back to the parent component.
 With `dispatchGlobalEvent` you can emit global application events which can be listened on (see [EventHub](#EventHub)).
 With `addGlobalEventListener` add a listener to the global [EventHub](#EventHub).
@@ -715,4 +717,43 @@ eventHub.addListener("openModal", listener);
 evenHub.dispatchEvent("openModal", {data: "anyPayload"});
 
 eventHub.removeListener("openModal", listener);
+```
+
+## Global Store
+There is a global store which will be the same in every component. Within a template you can access it by using `$store` like this:
+```html
+    @@{$store.counter}
+```
+
+To fill it with values you can call the `store` function which will give you the global store. Then you can add states to it by using the `add` method. You pass it by wrapping your states in an object and they will be available within the template with the same name like this: `$store.stateName`. Additionally you can use the store's `watch` method to watch a state on the store. For safety reasons the watcher callback will only get the `.value` of the state to avoid endless update-watch loops.
+
+```javascript
+const store = Elaine.store();
+const counter = Elaine.state(0);
+const counterDoubled = Elaine.state(0);
+const constant = 10;
+store.add({ counter, counterDoubled, constant });
+store.watch("counter", (c) => {
+    counterDoubled.value = c * 2;
+});
+```
+
+Within life-cycle hooks you can also access the store via the given internal state:
+```javascript
+setup: (state) => {
+        const count = () => {
+            state.$store.counter++;
+        }
+
+        state.$store.watch("counterDoubled", (c) => {
+            console.log("counterDoubled", c);
+        });
+
+        return {
+            state: {
+                count
+            },
+            components: [componentWithin]
+        }
+    }
 ```

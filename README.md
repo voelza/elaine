@@ -764,3 +764,56 @@ setup: (state) => {
         }
     }
 ```
+
+## Build-in Functions
+There are multiple build-in functions which are useable within template. All theses functions are used to represent a certain value as a locale string.
+
+To configure the input of theses functions you have to use the `withOptions` function and pass a `ElaineOption` object.
+```javascript
+export type ElaineOptions = {
+    locale?: string,
+    dateFormats?: DateFormat[],
+    numberFormats?: NumberFormat[],
+    translations?: Object
+}
+```
+
+```html
+@@{$number(10000.25)}
+@@{$number(10000.25, int)}
+@@{$number(10000, twoDigits)}
+@@{$number(10000, threeDigits)}
+```
+
+The `$number` function is called with a number as first parameter and with the format as the second optional parameter. There are a few build-in formats like `int` and `twoDigits`. Additional formats can be added within the `ElaineOption` and the `withOptions` function.
+
+```html
+@@{$date(@@date)}
+@@{$date(@@date, medium)}
+```
+
+The `$date` function is called with a date as first parameter and with the format as the second optional parameter. There are a few build-in formats like `short`, `medium`, `long` and `full`. Additional formats can be added within the `ElaineOption` and the `withOptions` function.
+
+```html
+@@{$strDate(@@dateStr, shortLong)}
+@@{$strDate(@@dateStr, long)}
+```
+The `$strDate` function is called with a date-string as first parameter and with the format as the second optional parameter. There are a few build-in formats like `short`, `medium`, `long` and `full`. Additional formats can be added within the `ElaineOption` and the `withOptions` function.
+
+```html
+@@{$t(app.title)}
+```
+The `$t` function is to translate a given key with a given translation map and a given locale. The translations have to be deposited in the `ElaineOption` in the `withOptions`. You can do this like this:
+```javascript
+Elaine.withOptions({
+    translations: {
+        "de": {
+            "app.title": "Yo-Yo-Yo-Minator"
+        },
+        "en": {
+            "app.title": "No-No-No-Minator"
+        }
+    }
+});
+```
+The key here is `app.title` will become the string `Yo-Yo-Yo-Minator` when you run `$t(app.title)`. If the key is not in the translation map the key will be displayed.

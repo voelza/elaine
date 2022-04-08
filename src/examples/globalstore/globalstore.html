@@ -10,6 +10,9 @@
 <body>
     <div id="app">
         <h1>@@{$number(10000.25)}</h1>
+        <h1>@@{$number(10000.25, int)}</h1>
+        <h1>@@{$number(10000, twoDigits)}</h1>
+        <h1>@@{$number(10000, threeDigits)}</h1>
         <h1>@@{$date(@@date)}</h1>
         <h1>@@{$date(@@date, medium)}</h1>
         <h1>@@{$strDate(@@dateStr, shortLong)}</h1>

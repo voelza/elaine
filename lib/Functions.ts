@@ -16,15 +16,27 @@ export type NumberOptions = {
     maxFractions: number
 }
 
+export type NumberFormat = {
+    name: string,
+    format: NumberOptions
+}
+
 
 let locale = appOptions.value.locale;
 const dateFormats = new Map<string, DateOptions>();
+const numberFormats = new Map<string, NumberOptions>();
 
 const setOptions = () => {
-    locale = appOptions.value.locale
+    locale = appOptions.value.locale;
+
     dateFormats.clear();
     for (const format of appOptions.value.dateFormats || []) {
         dateFormats.set(format.name, format.format);
+    }
+
+    dateFormats.clear();
+    for (const format of appOptions.value.numberFormats || []) {
+        numberFormats.set(format.name, format.format);
     }
 };
 
@@ -37,7 +49,6 @@ export function dateToDateTimeStr(
     format: string | undefined = undefined
 ): string {
     const options = format ? dateFormats.get(format) : undefined;
-    console.log(format, dateFormats);
     return new Intl.DateTimeFormat(locale, { dateStyle: options?.dateStyle, timeStyle: options?.timeStyle }).format(date);
 }
 
@@ -50,7 +61,8 @@ export function strDateToDateTimeStr(
 
 export function localeNumber(
     number: number,
-    options: NumberOptions | undefined = undefined
+    format: string | undefined = undefined
 ): string {
+    const options = format ? numberFormats.get(format) : undefined;
     return new Intl.NumberFormat(locale, { maximumFractionDigits: options?.maxFractions, minimumFractionDigits: options?.minFractions }).format(number);
 }

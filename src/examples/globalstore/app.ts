@@ -1,6 +1,4 @@
 import Elaine from "../../../lib/Elaine";
-import { ElaineOptions } from "../../../lib/Options";
-
 
 const componentWithin = Elaine.component({
     name: "test",
@@ -57,6 +55,15 @@ Elaine.withOptions({
             format: {
                 timeStyle: "long",
                 dateStyle: "short"
+            }
+        }
+    ],
+    numberFormats: [
+        {
+            name: "threeDigits",
+            format: {
+                minFractions: 3,
+                maxFractions: 3
             }
         }
     ]

@@ -1,10 +1,11 @@
-import { DateFormat } from "./Functions";
+import { DateFormat, NumberFormat } from "./Functions";
 import MutableState from "./states/MutableState";
 import State from "./states/State";
 
 export type ElaineOptions = {
     locale?: string,
-    dateFormats?: DateFormat[]
+    dateFormats?: DateFormat[],
+    numberFormats?: NumberFormat[]
 }
 
 const defaultDateFormats: DateFormat[] = [
@@ -38,14 +39,31 @@ const defaultDateFormats: DateFormat[] = [
     }
 ];
 
+const defaultNumberFormats: NumberFormat[] = [
+    {
+        name: "int",
+        format: {
+            minFractions: 0,
+            maxFractions: 0
+        }
+    },
+    {
+        name: "twoDigits",
+        format: {
+            minFractions: 2,
+            maxFractions: 2
+        }
+    },
+];
+
 let appOptions: State<ElaineOptions> = new MutableState({
     dateFormats: defaultDateFormats
 });
 
 export function setAppOptions(options: ElaineOptions): void {
     options.dateFormats = [...options.dateFormats || [], ...defaultDateFormats];
+    options.numberFormats = [...options.numberFormats || [], ...defaultNumberFormats];
     appOptions.value = options;
-    console.log(appOptions);
 }
 
 export default appOptions;

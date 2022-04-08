@@ -1,29 +1,51 @@
+import WatcherLink from "./links/WatcherLink";
 import appOptions from "./Options";
-
-const locale = appOptions.locale;
 
 export type DateOptions = {
     dateStyle: "full" | "medium" | "short" | "long" | undefined,
     timeStyle: "full" | "medium" | "short" | "long" | undefined
 }
 
-export function dateToDateTimeStr(
-    date: Date,
-    options: DateOptions | undefined = undefined
-): string {
-    return new Intl.DateTimeFormat(locale, { dateStyle: options?.dateStyle, timeStyle: options?.timeStyle }).format(date);
-}
-
-export function strDateToDateTimeStr(
-    date: string,
-    options: DateOptions | undefined = undefined
-): string {
-    return dateToDateTimeStr(new Date(date), options);
+export type DateFormat = {
+    name: string,
+    format: DateOptions
 }
 
 export type NumberOptions = {
     minFractions: number,
     maxFractions: number
+}
+
+
+let locale = appOptions.value.locale;
+const dateFormats = new Map<string, DateOptions>();
+
+const setOptions = () => {
+    locale = appOptions.value.locale
+    dateFormats.clear();
+    for (const format of appOptions.value.dateFormats || []) {
+        dateFormats.set(format.name, format.format);
+    }
+};
+
+setOptions();
+const watcherLink: WatcherLink = new WatcherLink(setOptions, appOptions);
+appOptions.subscribe(watcherLink);
+
+export function dateToDateTimeStr(
+    date: Date,
+    format: string | undefined = undefined
+): string {
+    const options = format ? dateFormats.get(format) : undefined;
+    console.log(format, dateFormats);
+    return new Intl.DateTimeFormat(locale, { dateStyle: options?.dateStyle, timeStyle: options?.timeStyle }).format(date);
+}
+
+export function strDateToDateTimeStr(
+    date: string,
+    format: string | undefined = undefined
+): string {
+    return dateToDateTimeStr(new Date(date), format);
 }
 
 export function localeNumber(

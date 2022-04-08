@@ -1,4 +1,5 @@
 import Elaine from "../../../lib/Elaine";
+import { ElaineOptions } from "../../../lib/Options";
 
 
 const componentWithin = Elaine.component({
@@ -48,6 +49,18 @@ store.watch("counter", (c) => {
     counterDoubled.value = c * 2;
 });
 
+
+Elaine.withOptions({
+    dateFormats: [
+        {
+            name: "shortLong",
+            format: {
+                timeStyle: "long",
+                dateStyle: "short"
+            }
+        }
+    ]
+});
 
 const date = new Date();
 const dateStr = '2022-04-08T20:00:00';

@@ -11,9 +11,9 @@
     <div id="app">
         <h1>@@{$number(10000.25)}</h1>
         <h1>@@{$date(@@date)}</h1>
-        <h1>@@{$date(@@date,|'dateStyle':'short' 'timeStyle':'medium'|)}</h1>
-        <h1>@@{$strDate(@@dateStr)}</h1>
-        <h1>@@{$strDate(@@dateStr, |'dateStyle':'medium' 'timeStyle':'medium'|)}</h1>
+        <h1>@@{$date(@@date, medium)}</h1>
+        <h1>@@{$strDate(@@dateStr, shortLong)}</h1>
+        <h1>@@{$strDate(@@dateStr, long)}</h1>
         Counter on Parent: @@{$store.counter} * 2 = @@{$store.counterDoubled} (Constant is @@{$store.constant})
         <test></test>
     </div>

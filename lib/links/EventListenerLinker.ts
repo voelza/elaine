@@ -43,7 +43,6 @@ function getFunctionInfo(functionCall: string, instance: Instance): FunctionInfo
                             .replace(/\|/, "}")
                             .replaceAll(/(')([\s]+)(')/g, "$1,$3")
                             .replaceAll(/'/g, "\"");
-                    console.log(stateAsJSON);
                     stateValue = JSON.parse(stateAsJSON);
                 }
                 state = new FunctionImmutableState(stateValue);

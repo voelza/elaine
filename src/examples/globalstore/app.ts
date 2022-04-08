@@ -49,7 +49,13 @@ store.watch("counter", (c) => {
 });
 
 
+const date = new Date();
+const dateStr = '2022-04-08T20:00:00';
 Elaine.setup(document.getElementById("app")!, {
+    state: {
+        date,
+        dateStr
+    },
     components: [component]
 }
 );

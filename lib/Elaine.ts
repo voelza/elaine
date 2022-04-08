@@ -2,6 +2,7 @@ import Component from "./Component";
 import EventHub, { EventHubInstance } from "./EventHub";
 import Instance, { Origin } from "./Instance";
 import WatcherLink from "./links/WatcherLink";
+import { ElaineOptions, setAppOptions } from "./Options";
 import { ComponentData, InstanceState, SetupState } from "./PublicTypes";
 import ComputedState from "./states/ComputedState";
 import MutableState from "./states/MutableState";
@@ -54,7 +55,7 @@ Object.defineProperty(Object.prototype, "getValueForKeyPath", {
 });
 
 
-function setup(element: Element, setupState: SetupState | undefined = undefined): InstanceState {
+export function setup(element: Element, setupState: SetupState | undefined = undefined): InstanceState {
     const instance = new Instance(
         Origin.SETUP,
         element,
@@ -77,18 +78,18 @@ function setup(element: Element, setupState: SetupState | undefined = undefined)
     return instance.internalState;
 };
 
-function state<T>(value: T): State<T> {
+export function state<T>(value: T): State<T> {
     return new MutableState(value);
 }
 
-function watch(watcher: () => void, ...states: State<any>[]): void {
+export function watch(watcher: () => void, ...states: State<any>[]): void {
     const watcherLink: WatcherLink = new WatcherLink(watcher, ...states);
     for (const state of states) {
         state.subscribe(watcherLink);
     }
 }
 
-function computed<T>(computer: () => T, ...states: State<any>[]): ComputedState<T> {
+export function computed<T>(computer: () => T, ...states: State<any>[]): ComputedState<T> {
     const computedValue: ComputedState<T> = new ComputedState(computer, states);
     for (const state of states) {
         state?.subscribe(computedValue);
@@ -96,14 +97,14 @@ function computed<T>(computer: () => T, ...states: State<any>[]): ComputedState<
     return computedValue;
 }
 
-function templateToElement(templateCode: string): Element {
+export function templateToElement(templateCode: string): Element {
     const template = document.createElement('template');
     templateCode = templateCode.trim();
     template.innerHTML = templateCode;
     return template.content.firstChild as Element;
 }
 
-function component(componentData: ComponentData): Component {
+export function component(componentData: ComponentData): Component {
     const name = componentData.name.toUpperCase();
     const element = typeof componentData.template === "string" ? templateToElement(componentData.template) : componentData.template;
     return new Component(
@@ -121,12 +122,16 @@ function component(componentData: ComponentData): Component {
     );
 }
 
-function eventHub(): EventHubInstance {
+export function eventHub(): EventHubInstance {
     return EventHub;
 }
 
-function store(): StoreInstance {
+export function store(): StoreInstance {
     return Store.value;
+}
+
+export function withOptions(options: ElaineOptions) {
+    setAppOptions(options);
 }
 
 export default {
@@ -136,5 +141,6 @@ export default {
     computed,
     component,
     eventHub,
-    store
+    store,
+    withOptions
 };

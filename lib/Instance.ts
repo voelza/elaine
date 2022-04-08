@@ -14,6 +14,7 @@ import { retrieveBindings } from "./utils/RegexMatcher";
 import RenderLink from "./links/RenderLink";
 import EventHub, { GlobalEventListener } from "./EventHub";
 import Store from "./Store";
+import { dateToDateTimeStr, strDateToDateTimeStr, localeNumber } from "./Functions";
 
 export enum Origin {
     SETUP,
@@ -25,17 +26,6 @@ export enum Origin {
 export const SLOT_INDICATOR = "elaine-slot";
 export const SLOT_RESOLVER = "elaine-slot-resolver";
 const SLOT_PARENT_COMPONENT = "elaine-parent-component";
-
-
-function dateToDateStr(date: Date): string {
-    return date.toLocaleDateString();
-}
-function dateToTimeStr(date: Date): string {
-    return date.toLocaleTimeString();
-}
-function dateToDateTimeStr(date: Date): string {
-    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
-}
 
 const componentElements: string[] = [];
 
@@ -137,9 +127,9 @@ export default class Instance {
 
         this.wasCreated = false;
 
-        this.methods.set("$date", dateToDateStr);
-        this.methods.set("$time", dateToTimeStr);
-        this.methods.set("$dateTime", dateToDateTimeStr);
+        this.methods.set("$date", dateToDateTimeStr);
+        this.methods.set("$strDate", strDateToDateTimeStr);
+        this.methods.set("$number", localeNumber);
 
         this.states.set("$store", Store);
 

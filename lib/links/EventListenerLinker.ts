@@ -2,7 +2,7 @@ import Instance from "../Instance";
 import FunctionImmutableState from "../states/FunctionImmutableState";
 import State from "../states/State";
 import { StateBinding } from "../states/StateBinding";
-import { BINDING, EVENT_LISTENER_PARENT_CALL_ID, TEMPLATE_PARENT_CALL } from "../Syntax";
+import { BINDING, EVENT_LISTENER_PARENT_CALL_ID, OBJECT_FUNCTION_CALL, TEMPLATE_PARENT_CALL } from "../Syntax";
 import { getBindingNameFromKeyPath, getValuePath } from "../utils/PathHelper";
 import ConditionalEventListenerLink from "./ConditionalEventListenerLink";
 import { ConditionalStateBinding, parseConditionalBindingWithoutBindings } from "./ConditionalStateBinding";
@@ -35,7 +35,18 @@ function getFunctionInfo(functionCall: string, instance: Instance): FunctionInfo
                 state = stateName.startsWith(TEMPLATE_PARENT_CALL) ? instance.parent!.getState(stateName.substring(TEMPLATE_PARENT_CALL.length)) : instance.getState(stateName);
             } else {
                 stateName = paramName;
-                state = new FunctionImmutableState(paramName);
+                let stateValue = paramName;
+                if (stateName.startsWith(OBJECT_FUNCTION_CALL)) {
+                    const stateAsJSON =
+                        paramName
+                            .replace(/\|/, "{")
+                            .replace(/\|/, "}")
+                            .replaceAll(/(')([\s]+)(')/g, "$1,$3")
+                            .replaceAll(/'/g, "\"");
+                    console.log(stateAsJSON);
+                    stateValue = JSON.parse(stateAsJSON);
+                }
+                state = new FunctionImmutableState(stateValue);
             }
 
             params.push({

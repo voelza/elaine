@@ -681,6 +681,13 @@ Will result in:
 The One To Rule Them All
 ```
 
+#### Passing objects within template as function paramter
+You can do this but it's super ugly because we cannot use `{}` because of our syntax (I might need to change that at some point). To do this you have to use `|` and within you can declare the objects properties. You cannot use the comma `,` because it is also used to parse the function parameters which is why you have to simply use white spaces instead.
+
+```html
+@@{dateToLocaleDateStr(@@date,|'dateStyle':'short' 'timeStyle':'medium'|)}
+```
+
 ## EventHub 
 There is a global `EventHub` to dispatch events (with payloads) and listen to them. You have access to these in every life-cycle hook by calling the `dispatchGlobalEvent` method and the `addGlobalEventListener` method on the given internal instance state.
 

@@ -17,6 +17,7 @@
         <h1>@@{$date(@@date, medium)}</h1>
         <h1>@@{$strDate(@@dateStr, shortLong)}</h1>
         <h1>@@{$strDate(@@dateStr, long)}</h1>
+        @@{$t(app.title)}
         Counter on Parent: @@{$store.counter} * 2 = @@{$store.counterDoubled} (Constant is @@{$store.constant})
         <test></test>
     </div>

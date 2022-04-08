@@ -66,7 +66,15 @@ Elaine.withOptions({
                 maxFractions: 3
             }
         }
-    ]
+    ],
+    translations: {
+        "de": {
+            "app.title": "Yo-Yo-Yo-Minator"
+        },
+        "en": {
+            "app.title": "No-No-No-Minator"
+        }
+    }
 });
 
 const date = new Date();

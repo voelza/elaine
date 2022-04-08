@@ -14,7 +14,7 @@ import { retrieveBindings } from "./utils/RegexMatcher";
 import RenderLink from "./links/RenderLink";
 import EventHub, { GlobalEventListener } from "./EventHub";
 import Store from "./Store";
-import { dateToDateTimeStr, strDateToDateTimeStr, localeNumber } from "./Functions";
+import { dateToDateTimeStr, strDateToDateTimeStr, localeNumber, translate } from "./Functions";
 
 export enum Origin {
     SETUP,
@@ -130,6 +130,7 @@ export default class Instance {
         this.methods.set("$date", dateToDateTimeStr);
         this.methods.set("$strDate", strDateToDateTimeStr);
         this.methods.set("$number", localeNumber);
+        this.methods.set("$t", translate);
 
         this.states.set("$store", Store);
 

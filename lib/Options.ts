@@ -5,7 +5,8 @@ import State from "./states/State";
 export type ElaineOptions = {
     locale?: string,
     dateFormats?: DateFormat[],
-    numberFormats?: NumberFormat[]
+    numberFormats?: NumberFormat[],
+    translations?: Object
 }
 
 const defaultDateFormats: DateFormat[] = [
@@ -57,7 +58,8 @@ const defaultNumberFormats: NumberFormat[] = [
 ];
 
 let appOptions: State<ElaineOptions> = new MutableState({
-    dateFormats: defaultDateFormats
+    dateFormats: defaultDateFormats,
+    translations: {}
 });
 
 export function setAppOptions(options: ElaineOptions): void {

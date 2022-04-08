@@ -25,18 +25,29 @@ export type NumberFormat = {
 let locale = appOptions.value.locale;
 const dateFormats = new Map<string, DateOptions>();
 const numberFormats = new Map<string, NumberOptions>();
+const translations = new Map<string, string>();
 
 const setOptions = () => {
     locale = appOptions.value.locale;
 
     dateFormats.clear();
-    for (const format of appOptions.value.dateFormats || []) {
-        dateFormats.set(format.name, format.format);
+    for (const { name, format } of appOptions.value.dateFormats || []) {
+        dateFormats.set(name, format);
     }
 
-    dateFormats.clear();
-    for (const format of appOptions.value.numberFormats || []) {
-        numberFormats.set(format.name, format.format);
+    numberFormats.clear();
+    for (const { name, format } of appOptions.value.numberFormats || []) {
+        numberFormats.set(name, format);
+    }
+
+    translations.clear();
+    // @ts-ignore
+    const t: Object | undefined = appOptions.value.translations[locale ?? navigator.language.split("-")[0]];
+    if (t) {
+        for (const key of Object.keys(t)) {
+            // @ts-ignore
+            translations.set(key, t[key]);
+        }
     }
 };
 
@@ -65,4 +76,9 @@ export function localeNumber(
 ): string {
     const options = format ? numberFormats.get(format) : undefined;
     return new Intl.NumberFormat(locale, { maximumFractionDigits: options?.maxFractions, minimumFractionDigits: options?.minFractions }).format(number);
+}
+
+export function translate(key: string): string {
+    const value = translations.get(key);
+    return value ?? key;
 }

@@ -11,10 +11,11 @@ const EVENT_LISTENER_PARENT_CALL_ID = "!++";
 const REACTIVE_CONCAT = "##";
 const TEXT_BINDER = (binding) => new RegExp(BINDING + "{" + binding.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&") + "}", "g");
 const ATTRIBUTE_BINDER = (binding) => new RegExp(BINDING + binding.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
-const ATTRIBUTE_ELEMENT_STATE_BINDING = new RegExp(BINDING + "([!]?[a-zA-Z0-9\\(@@\\)_$.,\\s~]+)", "g");
-const TEXT_STATE_BINDING = new RegExp(BINDING + "\\{([!]?[a-zA-Z0-9\\(@@\\)_$.,\\s~]+)\\}", "g");
+const ATTRIBUTE_ELEMENT_STATE_BINDING = new RegExp(BINDING + "([!]?[a-zA-Z0-9\\(@@\\)_$.,\\s~\\|:']+)", "g");
+const TEXT_STATE_BINDING = new RegExp(BINDING + `\\{([!]?[a-zA-Z0-9\\(@@\\)_$.,\\s~\\|:'"]+)\\}`, "g");
 const TEXT_CONDITIONAL_STATE_BINDING = new RegExp(BINDING + "\\{(\\{.+\\})\\}", "g");
 const LOOP_BINDING = new RegExp("(.+) in (.+)", "g");
+const OBJECT_FUNCTION_CALL = "|";
 function getValue(keyPath, value) {
   if (!value) {
     return value;
@@ -463,7 +464,12 @@ function getFunctionInfo(functionCall, instance) {
         state2 = stateName.startsWith(TEMPLATE_PARENT_CALL) ? instance.parent.getState(stateName.substring(TEMPLATE_PARENT_CALL.length)) : instance.getState(stateName);
       } else {
         stateName = paramName;
-        state2 = new FunctionImmutableState(paramName);
+        let stateValue = paramName;
+        if (stateName.startsWith(OBJECT_FUNCTION_CALL)) {
+          const stateAsJSON = paramName.replace(/\|/, "{").replace(/\|/, "}").replaceAll(/(')([\s]+)(')/g, "$1,$3").replaceAll(/'/g, '"');
+          stateValue = JSON.parse(stateAsJSON);
+        }
+        state2 = new FunctionImmutableState(stateValue);
       }
       params.push({
         binding: paramName,
@@ -1256,6 +1262,106 @@ class StoreState {
   }
 }
 var Store = new StoreState();
+class WatcherLink {
+  constructor(watcher, ...states) {
+    __publicField(this, "watcher");
+    __publicField(this, "states");
+    this.watcher = watcher;
+    this.states = states;
+  }
+  init() {
+  }
+  update() {
+    this.watcher();
+  }
+  destroy() {
+    for (const state2 of this.states) {
+      state2.unsubscribe(this);
+    }
+  }
+}
+const defaultDateFormats = [
+  {
+    name: "short",
+    format: {
+      dateStyle: "short",
+      timeStyle: "short"
+    }
+  },
+  {
+    name: "long",
+    format: {
+      dateStyle: "long",
+      timeStyle: "long"
+    }
+  },
+  {
+    name: "medium",
+    format: {
+      dateStyle: "medium",
+      timeStyle: "medium"
+    }
+  },
+  {
+    name: "full",
+    format: {
+      dateStyle: "full",
+      timeStyle: "full"
+    }
+  }
+];
+const defaultNumberFormats = [
+  {
+    name: "int",
+    format: {
+      minFractions: 0,
+      maxFractions: 0
+    }
+  },
+  {
+    name: "twoDigits",
+    format: {
+      minFractions: 2,
+      maxFractions: 2
+    }
+  }
+];
+let appOptions = new MutableState({
+  dateFormats: defaultDateFormats
+});
+function setAppOptions(options) {
+  options.dateFormats = [...options.dateFormats || [], ...defaultDateFormats];
+  options.numberFormats = [...options.numberFormats || [], ...defaultNumberFormats];
+  appOptions.value = options;
+}
+let locale = appOptions.value.locale;
+const dateFormats = /* @__PURE__ */ new Map();
+const numberFormats = /* @__PURE__ */ new Map();
+const setOptions = () => {
+  locale = appOptions.value.locale;
+  dateFormats.clear();
+  for (const format of appOptions.value.dateFormats || []) {
+    dateFormats.set(format.name, format.format);
+  }
+  dateFormats.clear();
+  for (const format of appOptions.value.numberFormats || []) {
+    numberFormats.set(format.name, format.format);
+  }
+};
+setOptions();
+const watcherLink = new WatcherLink(setOptions, appOptions);
+appOptions.subscribe(watcherLink);
+function dateToDateTimeStr(date, format = void 0) {
+  const options = format ? dateFormats.get(format) : void 0;
+  return new Intl.DateTimeFormat(locale, { dateStyle: options == null ? void 0 : options.dateStyle, timeStyle: options == null ? void 0 : options.timeStyle }).format(date);
+}
+function strDateToDateTimeStr(date, format = void 0) {
+  return dateToDateTimeStr(new Date(date), format);
+}
+function localeNumber(number, format = void 0) {
+  const options = format ? numberFormats.get(format) : void 0;
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: options == null ? void 0 : options.maxFractions, minimumFractionDigits: options == null ? void 0 : options.minFractions }).format(number);
+}
 var Origin = /* @__PURE__ */ ((Origin2) => {
   Origin2[Origin2["SETUP"] = 0] = "SETUP";
   Origin2[Origin2["COMPONENT"] = 1] = "COMPONENT";
@@ -1266,15 +1372,6 @@ var Origin = /* @__PURE__ */ ((Origin2) => {
 const SLOT_INDICATOR = "elaine-slot";
 const SLOT_RESOLVER = "elaine-slot-resolver";
 const SLOT_PARENT_COMPONENT = "elaine-parent-component";
-function dateToDateStr(date) {
-  return date.toLocaleDateString();
-}
-function dateToTimeStr(date) {
-  return date.toLocaleTimeString();
-}
-function dateToDateTimeStr(date) {
-  return date.toLocaleDateString() + " " + date.toLocaleTimeString();
-}
 const componentElements = [];
 class Instance {
   constructor(origin, element, template, parent = void 0, props = [], slots = [], setup2 = void 0, onMounted = void 0, beforeUnmounted = void 0, onUnmounted = void 0, beforeDestroyed = void 0, onDestroyed = void 0, components = void 0) {
@@ -1349,9 +1446,9 @@ class Instance {
       this.conditionLink.init();
     }
     this.wasCreated = false;
-    this.methods.set("$date", dateToDateStr);
-    this.methods.set("$time", dateToTimeStr);
-    this.methods.set("$dateTime", dateToDateTimeStr);
+    this.methods.set("$date", dateToDateTimeStr);
+    this.methods.set("$strDate", strDateToDateTimeStr);
+    this.methods.set("$number", localeNumber);
     this.states.set("$store", Store);
     if (this.components.size > 0) {
       for (const component2 of this.components.values()) {
@@ -1714,24 +1811,6 @@ class Component {
     return new Instance(Origin.COMPONENT, element, this.template, parent, this.props, this.slots, this.setup, this.onMounted, this.beforeUnmounted, this.onUnmounted, this.beforeDestroyed, this.onDestroyed);
   }
 }
-class WatcherLink {
-  constructor(watcher, ...states) {
-    __publicField(this, "watcher");
-    __publicField(this, "states");
-    this.watcher = watcher;
-    this.states = states;
-  }
-  init() {
-  }
-  update() {
-    this.watcher();
-  }
-  destroy() {
-    for (const state2 of this.states) {
-      state2.unsubscribe(this);
-    }
-  }
-}
 Object.defineProperty(Object.prototype, "setValueForKey", {
   value: function(value, key) {
     this[key] = value;
@@ -1786,9 +1865,9 @@ function state(value) {
   return new MutableState(value);
 }
 function watch(watcher, ...states) {
-  const watcherLink = new WatcherLink(watcher, ...states);
+  const watcherLink2 = new WatcherLink(watcher, ...states);
   for (const state2 of states) {
-    state2.subscribe(watcherLink);
+    state2.subscribe(watcherLink2);
   }
 }
 function computed(computer, ...states) {
@@ -1815,6 +1894,9 @@ function eventHub() {
 function store() {
   return Store.value;
 }
+function withOptions(options) {
+  setAppOptions(options);
+}
 var Elaine = {
   setup,
   state,
@@ -1822,6 +1904,7 @@ var Elaine = {
   computed,
   component,
   eventHub,
-  store
+  store,
+  withOptions
 };
-export { Elaine as default };
+export { component, computed, Elaine as default, eventHub, setup, state, store, templateToElement, watch, withOptions };

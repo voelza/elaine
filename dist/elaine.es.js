@@ -1327,7 +1327,8 @@ const defaultNumberFormats = [
   }
 ];
 let appOptions = new MutableState({
-  dateFormats: defaultDateFormats
+  dateFormats: defaultDateFormats,
+  translations: {}
 });
 function setAppOptions(options) {
   options.dateFormats = [...options.dateFormats || [], ...defaultDateFormats];
@@ -1337,15 +1338,23 @@ function setAppOptions(options) {
 let locale = appOptions.value.locale;
 const dateFormats = /* @__PURE__ */ new Map();
 const numberFormats = /* @__PURE__ */ new Map();
+const translations = /* @__PURE__ */ new Map();
 const setOptions = () => {
   locale = appOptions.value.locale;
   dateFormats.clear();
-  for (const format of appOptions.value.dateFormats || []) {
-    dateFormats.set(format.name, format.format);
+  for (const { name, format } of appOptions.value.dateFormats || []) {
+    dateFormats.set(name, format);
   }
-  dateFormats.clear();
-  for (const format of appOptions.value.numberFormats || []) {
-    numberFormats.set(format.name, format.format);
+  numberFormats.clear();
+  for (const { name, format } of appOptions.value.numberFormats || []) {
+    numberFormats.set(name, format);
+  }
+  translations.clear();
+  const t = appOptions.value.translations[locale != null ? locale : navigator.language.split("-")[0]];
+  if (t) {
+    for (const key of Object.keys(t)) {
+      translations.set(key, t[key]);
+    }
   }
 };
 setOptions();
@@ -1361,6 +1370,10 @@ function strDateToDateTimeStr(date, format = void 0) {
 function localeNumber(number, format = void 0) {
   const options = format ? numberFormats.get(format) : void 0;
   return new Intl.NumberFormat(locale, { maximumFractionDigits: options == null ? void 0 : options.maxFractions, minimumFractionDigits: options == null ? void 0 : options.minFractions }).format(number);
+}
+function translate(key) {
+  const value = translations.get(key);
+  return value != null ? value : key;
 }
 var Origin = /* @__PURE__ */ ((Origin2) => {
   Origin2[Origin2["SETUP"] = 0] = "SETUP";
@@ -1449,6 +1462,7 @@ class Instance {
     this.methods.set("$date", dateToDateTimeStr);
     this.methods.set("$strDate", strDateToDateTimeStr);
     this.methods.set("$number", localeNumber);
+    this.methods.set("$t", translate);
     this.states.set("$store", Store);
     if (this.components.size > 0) {
       for (const component2 of this.components.values()) {

@@ -27,11 +27,11 @@ States can be variables which where called by the `state(value)` method (as you 
 
 The template portion of your application can be directly in the DOM itself.
 ```html
-    <div id="app">
-        <h1>@@{immutableState}</h1>
-        @@{counter}
-        <button ++click="increaseCounter">Count</button>
-    </div>
+<div id="app">
+    <h1>@@{immutableState}</h1>
+    @@{counter}
+    <button ++click="increaseCounter">Count</button>
+</div>
 ```
 By using the `@@{counter}` you can link the `counter` state to a text node in the DOM. With the `++click="increaseCounter"` attribute on the button element we linked our `increaseCounter` function to the DOM element. This is how the linking process in this framework works.
 
@@ -136,10 +136,10 @@ const increaseCounter = () => {
 };
 ```
 ```html
-    <div id="app">
-        @@{counter}
-        <button ++click="increaseCounter">Count</button>
-    </div>
+<div id="app">
+    @@{counter}
+    <button ++click="increaseCounter">Count</button>
+</div>
 ```
 This for example will call the `increaseCounter` method each time the button is clicked.
 
@@ -151,8 +151,8 @@ const setText = (e) => {
 };
 ```
 ```html 
-    @@{text}
-    <input type="text" ++input="setText" @@value="@@text" />
+@@{text}
+<input type="text" ++input="setText" @@value="@@text" />
 ```
 
 This would update the `text` state whenever the input field fires the `input` event. Because these kind of bindings are very common there is a shortcut to bind `input` and `select` elements to given reactive states like this:
@@ -160,17 +160,17 @@ This would update the `text` state whenever the input field fires the `input` ev
 const text = Elaine.state("This is the default text.");
 ```
 ```html 
-    @@{text}
-    <input type="text" @@model="text" />
+@@{text}
+<input type="text" @@model="text" />
 ```
 
 ### Custom Components
 To reuse components within your application you can define components like this:
 
 ```html
-    <div id="app">
-        <counter></counter>
-    </div>
+<div id="app">
+    <counter></counter>
+</div>
 ```
 ```javascript
 const counterComponent = Elaine.component({
@@ -444,15 +444,15 @@ export default Elaine.component({
 On the parent side the template can be filled like this:
 ```html
 <modal title="Add a new tab!">
-      <header>
-            I will be in the header!
-      </header>  
-      <content>
+    <header>
+        I will be in the header!
+    </header>  
+    <content>
         <h2>@@{~title}</h2>
         <input @@model="@@todoTitle" type="text" placeholder="ToDo title" />
         <textarea @@model="@@todoContent" placeholder="ToDo content" rows="5"></textarea>
         <button ++click="addTodo" @@disabled="@@addTodoNotPossible">Add Todo</button>
-      </content>
+    </content>
 </modal>
 ```
 
@@ -498,17 +498,17 @@ const table = ELAINE.component({
 The slot `mycolumn` has to be different depending on which column it is within the table. Of course it could be achieved by using `@@if` but instead you can also use slots with variants by declaring a `variant` attribute to your slot within your component template. This will be evaluated and chose the right slot when the component instance is setting up.
 
 ```html
-    <myTable items="@@content" headers="@@headers">
-            <mycolumn>
-                <name>
-                    @@{getFirstName(@@~data)} @@{~data.lastname}
-                </name>
-                <birthdate>@@{$dateTime(@@~data)}</birthdate>
-                <default>
-                    <div ++click="showData(@@~data, @@~constant)">@@{~data}</div>
-                </default>
-            </mycolumn>
-    </myTable>
+<myTable items="@@content" headers="@@headers">
+    <mycolumn>
+        <name>
+            @@{getFirstName(@@~data)} @@{~data.lastname}
+        </name>
+        <birthdate>@@{$dateTime(@@~data)}</birthdate>
+        <default>
+            <div ++click="showData(@@~data, @@~constant)">@@{~data}</div>
+        </default>
+    </mycolumn>
+</myTable>
 ```
 To declare multiple variants of a slot you simply declare nested elements with the variant name within your parent DOM.
 
@@ -613,9 +613,9 @@ Beware that at the moment event names are always in lower-case.
 Sometimes it is necessary to interact with the state of a child-component. To achieve this you can annotate the component with a `ref` attribute and give it a name. On every life-cycle-method you have the ability to get the internal states of theses underlining components by refering to them by their ref-name like this:
 ```html
 <modal ref="usefulName" title="Modal">
-      <content>
-          Content of Modal
-      </content>
+    <content>
+        Content of Modal
+    </content>
 </modal>
 ```
 ```javascript
@@ -694,22 +694,22 @@ There is a global `EventHub` to dispatch events (with payloads) and listen to th
 These can be used like this on the Modal Component example:
 ```javascript
 setup: (state) => {
-        const open = (payload) => {
-            console.log(payload);
+    const open = (payload) => {
+        console.log(payload);
 
-            document.body.appendChild(backdrop);
-            document.body.appendChild(modal);
-        };
+        document.body.appendChild(backdrop);
+        document.body.appendChild(modal);
+     };
 
-        state.addGlobalEventListener(`openmodal`, open);
+    state.addGlobalEventListener(`openmodal`, open);
 ``` 
 
 And like this to trigger the global event:
 ```javascript
 setup: (state) => {
-    const openModal = () => {
-        state.dispatchGlobalEvent(`openmodal`, {data: "anyPayload"});
-    };
+const openModal = () => {
+    state.dispatchGlobalEvent(`openmodal`, {data: "anyPayload"});
+};
 ```
 
 Global listeners which were registered by the `addGlobalEventListener` method of the internal state will automatically be removed after the instance was destroyed. If you want to use the `EventHub` outside life-cycle-methods you can use the `eventHub` function to fetch the global `EventHubInstance`. This would work pretty much the same but beware that the listeners are not automatically removed but you would have to call the method `removeListener` on the `EventHubInstance` yourself.
@@ -729,7 +729,7 @@ eventHub.removeListener("openModal", listener);
 ## Global Store
 There is a global store which will be the same in every component. Within a template you can access it by using `$store` like this:
 ```html
-    @@{$store.counter}
+@@{$store.counter}
 ```
 
 To fill it with values you can call the `store` function which will give you the global store. Then you can add states to it by using the `add` method. You pass it by wrapping your states in an object and they will be available within the template with the same name like this: `$store.stateName`. Additionally you can use the store's `watch` method to watch a state on the store. For safety reasons the watcher callback will only get the `.value` of the state to avoid endless update-watch loops.
@@ -748,21 +748,21 @@ store.watch("counter", (c) => {
 Within life-cycle hooks you can also access the store via the given internal state:
 ```javascript
 setup: (state) => {
-        const count = () => {
-            state.$store.counter++;
-        }
-
-        state.$store.watch("counterDoubled", (c) => {
-            console.log("counterDoubled", c);
-        });
-
-        return {
-            state: {
-                count
-            },
-            components: [componentWithin]
-        }
+    const count = () => {
+        state.$store.counter++;
     }
+
+    state.$store.watch("counterDoubled", (c) => {
+        console.log("counterDoubled", c);
+    });
+
+    return {
+        state: {
+            count
+        },
+        components: [componentWithin]
+    }
+}
 ```
 
 ## Build-in Functions

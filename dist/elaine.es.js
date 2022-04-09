@@ -11,7 +11,7 @@ const EVENT_LISTENER_PARENT_CALL_ID = "!++";
 const REACTIVE_CONCAT = "##";
 const TEXT_BINDER = (binding) => new RegExp(BINDING + "{" + binding.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&") + "}", "g");
 const ATTRIBUTE_BINDER = (binding) => new RegExp(BINDING + binding.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
-const ATTRIBUTE_ELEMENT_STATE_BINDING = new RegExp(BINDING + "([!]?[a-zA-Z0-9\\(@@\\)_$.,\\s~\\|:']+)", "g");
+const ATTRIBUTE_ELEMENT_STATE_BINDING = new RegExp(BINDING + "([!]?[a-zA-Z0-9\\(@@\\)_$.,\\s~\\|=']+)", "g");
 const TEXT_STATE_BINDING = new RegExp(BINDING + `\\{([!]?[a-zA-Z0-9\\(@@\\)_$.,\\s~\\|:'"]+)\\}`, "g");
 const TEXT_CONDITIONAL_STATE_BINDING = new RegExp(BINDING + "\\{(\\{.+\\})\\}", "g");
 const LOOP_BINDING = new RegExp("(.+) in (.+)", "g");
@@ -466,7 +466,7 @@ function getFunctionInfo(functionCall, instance) {
         stateName = paramName;
         let stateValue = paramName;
         if (stateName.startsWith(OBJECT_FUNCTION_CALL)) {
-          const stateAsJSON = paramName.replace(/\|/, "{").replace(/\|/, "}").replaceAll(/(')([\s]+)(')/g, "$1,$3").replaceAll(/'/g, '"');
+          const stateAsJSON = paramName.replace(/\|/, "{").replace(/\|/, "}").replace(/=/g, ":").replaceAll(/(')([\s]+)(')/g, "$1,$3").replaceAll(/'/g, '"');
           stateValue = JSON.parse(stateAsJSON);
         }
         state2 = new FunctionImmutableState(stateValue);
@@ -1483,12 +1483,18 @@ class Instance {
     this.resolveProps(this.element, this.parent);
     this.resolveSetup();
     this.resolveSlots(this.element);
-    for (const elementAttr of Array.from(this.element.attributes)) {
-      if (elementAttr.name.startsWith(COMPONENT_CSS_SCOPE)) {
-        continue;
+    if (this.origin === 1) {
+      for (const elementAttr of Array.from(this.element.attributes)) {
+        if (elementAttr.name.startsWith(COMPONENT_CSS_SCOPE)) {
+          continue;
+        }
+        const transferAttr = elementAttr.cloneNode(true);
+        const attrOnTemplate = this.template.attributes.getNamedItem(transferAttr.name);
+        if (attrOnTemplate) {
+          transferAttr.value += ` ${attrOnTemplate.value}`;
+        }
+        this.template.attributes.setNamedItem(transferAttr);
       }
-      const transferAttr = elementAttr.cloneNode(true);
-      this.template.attributes.setNamedItem(transferAttr);
     }
     link(this, this.template, this.parent);
     for (const link2 of this.links) {

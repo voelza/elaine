@@ -158,13 +158,19 @@ export default class Instance {
 
         this.resolveSlots(this.element);
 
-        // copy over attributes from parent
-        for (const elementAttr of Array.from(this.element.attributes)) {
-            if (elementAttr.name.startsWith(COMPONENT_CSS_SCOPE)) {
-                continue;
+        if (this.origin === Origin.COMPONENT) {
+            // copy over attributes from parent
+            for (const elementAttr of Array.from(this.element.attributes)) {
+                if (elementAttr.name.startsWith(COMPONENT_CSS_SCOPE)) {
+                    continue;
+                }
+                const transferAttr: Attr = elementAttr.cloneNode(true) as Attr;
+                const attrOnTemplate = this.template.attributes.getNamedItem(transferAttr.name)
+                if (attrOnTemplate) {
+                    transferAttr.value += ` ${attrOnTemplate.value}`;
+                }
+                this.template.attributes.setNamedItem(transferAttr);
             }
-            const transferAttr: Attr = elementAttr.cloneNode(true) as Attr;
-            this.template.attributes.setNamedItem(transferAttr);
         }
 
         // bindComponents from template (maybe)

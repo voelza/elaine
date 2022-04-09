@@ -41,6 +41,7 @@ function getFunctionInfo(functionCall: string, instance: Instance): FunctionInfo
                         paramName
                             .replace(/\|/, "{")
                             .replace(/\|/, "}")
+                            .replace(/=/g, ":")
                             .replaceAll(/(')([\s]+)(')/g, "$1,$3")
                             .replaceAll(/'/g, "\"");
                     stateValue = JSON.parse(stateAsJSON);

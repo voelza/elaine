@@ -282,7 +282,8 @@ const TheCarousel = ELAINE.component({
                 image1,
                 image2,
                 opacity1,
-                opacity2
+                opacity2,
+                interval
             }
         }
     },
@@ -303,7 +304,7 @@ const app = ELAINE.component({
                 Yo yo yo yo
             </header>
             <content>
-                <TheCarousel images="@@images" class="carousal"></TheCarousel>
+                <TheCarousel images="@@images" class="carousel"></TheCarousel>
             </content>
         </modal>
 
@@ -315,7 +316,7 @@ const app = ELAINE.component({
             </content>
         </modal>
 
-        <TheCarousel images="@@images" class="carousal"></TheCarousel>
+        <TheCarousel images="@@images" class="carousel"></TheCarousel>
     </div>
     `,
     css: `

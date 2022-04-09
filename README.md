@@ -1,6 +1,14 @@
 # ELAINE Documentation
 
-The frontend framework without a virtual DOM.
+The frontend framework without a virtual DOM. This is not recommended for production use and was mainly build as a learning experience and to use it on small projects. There might be a lot of bugs. There are no plans to make any official releases right now.
+
+## How to use
+You can simple use the umd build like this:
+```html
+<script src="https://cdn.jsdelivr.net/gh/voelza/elaine@v0.1.6/dist/elaine.umd.js"></script>
+```
+
+NPM version is not available at the moment and is also not planned.
 
 ## Concepts
 In this frontend framework everything is based around "states". States will be used to fill templates directly in the DOM and update them if they change. The main idea is to declare states on the JavaScript side and link them to DOM elements.

@@ -14,8 +14,8 @@
             <button ++click="selectPokemon(null)">Home</button>
         </nav>
         <main>
-            <pokemon @@if="@@detailPokemon !== null" pokemon="@@detailPokemon"></pokemon>
-            <div @@if="@@detailPokemon === null" class="pokemon-container">
+            <pokemon @@if="@@detailPokemon != null" pokemon="@@detailPokemon"></pokemon>
+            <div @@if="@@detailPokemon == null" class="pokemon-container">
                 <pokemon @@for="pokemon in @@pokemons" pokemon="@@pokemon" ++pokemon-selected="onPokemonSelected">
                 </pokemon>
             </div>

@@ -5,7 +5,7 @@ The frontend framework without a virtual DOM. This is not recommended for produc
 ## How to use
 You can simple use the umd build like this:
 ```html
-<script src="https://cdn.jsdelivr.net/gh/voelza/elaine@v0.1.6/dist/elaine.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/voelza/elaine@v0.1.7/dist/elaine.umd.js"></script>
 ```
 
 NPM version is not available at the moment and is also not planned.

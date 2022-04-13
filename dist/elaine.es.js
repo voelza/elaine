@@ -945,6 +945,9 @@ class AttributeLink extends DefaultTemplateLink {
     newAttributeValue += updateResult;
     if (!this.isBooleanAttribute || newAttributeValue === "true") {
       this.element.setAttribute(this.attribute, newAttributeValue);
+      if (this.attribute === "value") {
+        this.element.value = newAttributeValue;
+      }
     }
   }
 }

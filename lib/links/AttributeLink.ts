@@ -65,6 +65,10 @@ export default class AttributeLink extends DefaultTemplateLink {
 
         if (!this.isBooleanAttribute || newAttributeValue === "true") {
             this.element.setAttribute(this.attribute, newAttributeValue);
+            if (this.attribute === "value") {
+                // @ts-ignore
+                this.element.value = newAttributeValue;
+            }
         }
     }
 

@@ -523,7 +523,7 @@ To declare multiple variants of a slot you simply declare nested elements with t
 All the states references within a slots are by default the states from the parent instance and not from the component instance. To use states from the component instance you can use the `~` before the state name. So `@@~data` would refer to the `data` state of the component instance while `@@data` would refer to the `data` state of the parent instance.
 
 #### Component CSS
-You might also want to syle your components. You can do this by declaring your CSS within the `css` field in your component declaration. All your CSS will be scoped to your component and will only affect your component. So don't worry!
+You might also want to style your components. You can do this by declaring your CSS within the `css` field in your component declaration. All your CSS will be scoped to your component and will only affect your component. So don't worry!
 
 ```javascript
 export default Elaine.component({

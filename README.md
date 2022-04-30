@@ -89,7 +89,7 @@ To link text content of text nodes you have to use the following syntax:
 
 To link a state to an attribute you have to use @@ before the attributes name to indicate that it is a templated attribute and @@ within the template of the attribute value to reference your desired state.
 ```html
-<div @@style="fontSize: @@fontSizeState">@@{counter}</div>
+<div @@style="font-size: @@fontSizeState">@@{counter}</div>
 ```
 In this example `@@fontSizeState` would reference a state in JavaScript given to the `setup` function. 
 
@@ -652,19 +652,19 @@ Sometimes no spaces are allowed in HTML attribute but you don't want to include 
 const fontSize = Elaine.state("12px");
 ```
 ```html
-<div @@style="fontSize: @@fontSize">Hello World!</div>
+<div @@style="font-size: @@fontSize">Hello World!</div>
 ```
 You could write this:
 ```javascript
 const fontSize = Elaine.state(12);
 ```
 ```html
-<div @@style="fontSize: @@fontSize##px">Hello World!</div>
+<div @@style="font-size: @@fontSize##px">Hello World!</div>
 ```
 
 Both will become:
 ```html
-<div @@style="fontSize: 12px">Hello World!</div>
+<div @@style="font-size: 12px">Hello World!</div>
 ```
 
 #### Template declaration of states

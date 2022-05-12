@@ -1635,11 +1635,18 @@ class Instance {
       const propName = prop.name;
       const propAttr = element.getAttribute(propName);
       if (propAttr) {
-        const stateName = propAttr.substring(BINDING.length);
+        const statenNameWithoutBinding = propAttr.substring(BINDING.length);
+        const stateName = getBindingNameFromKeyPath(statenNameWithoutBinding);
         const state2 = parent == null ? void 0 : parent.getState(stateName);
         if (state2 && state2 instanceof MutableState || state2 instanceof ImmutableState || state2 instanceof ComputedState) {
-          this.states.set(propName, state2);
-          this.internalState.data[propName] = state2;
+          if (statenNameWithoutBinding.indexOf(".") === -1) {
+            this.states.set(propName, state2);
+            this.internalState.data[propName] = state2;
+          } else {
+            const subState = new ImmutableState(getValue(statenNameWithoutBinding, state2.value));
+            this.states.set(propName, subState);
+            this.internalState.data[propName] = subState;
+          }
         } else if (propAttr) {
           const immutableState = new ImmutableState(this.parseIntoType(prop.type, propAttr));
           this.states.set(propName, immutableState);
@@ -1830,9 +1837,80 @@ class Component {
       }
     }
   }
-  toInstance(element, parent) {
+  toInstance(element, parent = void 0) {
     return new Instance(Origin.COMPONENT, element, this.template, parent, this.props, this.slots, this.setup, this.onMounted, this.beforeUnmounted, this.onUnmounted, this.beforeDestroyed, this.onDestroyed);
   }
+}
+class Router {
+  constructor(routes, NotFound) {
+    __publicField(this, "routes");
+    __publicField(this, "currentPath");
+    __publicField(this, "currentRoute");
+    this.routes = routes;
+    this.currentPath = state(window.location.hash);
+    this.currentRoute = computed(() => {
+      const path = this.currentPath.value.slice(1) || "/";
+      return this.routes.find((route) => route.path === path) || { path: "/404", component: NotFound };
+    }, this.currentPath);
+    window.addEventListener("hashchange", () => {
+      this.currentPath.value = window.location.hash;
+    });
+  }
+  changeRoute(route) {
+    window.location.hash = route;
+  }
+}
+function router(routes, NotFound = void 0) {
+  if (!NotFound) {
+    NotFound = component({
+      name: "DefaultNotFound",
+      template: "<div>Route not found.</div>"
+    });
+  }
+  const router2 = new Router(routes, NotFound);
+  return {
+    router: router2,
+    routerComponent: component({
+      name: "router-view",
+      template: "<!-- router -->",
+      setup: (setupState) => {
+        const parentElement = templateToElement("<span></span>");
+        const parent = new Instance(Origin.COMPONENT, parentElement, parentElement, void 0, [], [], () => {
+          const currentRouteProps = computed(() => {
+            return router2.currentRoute.value.props;
+          }, router2.currentRoute);
+          return {
+            state: {
+              currentRouteProps
+            }
+          };
+        });
+        parent.setupIfNeeded();
+        let currentInstance;
+        function changeRoute() {
+          currentInstance == null ? void 0 : currentInstance.unmount();
+          currentInstance == null ? void 0 : currentInstance.destroy();
+          const currentRoute = router2.currentRoute.value;
+          const props = currentRoute.props ? Object.keys(currentRoute.props).map((k) => `${k}="@@currentRouteProps.${k}"`).join(" ") : "";
+          const componentElement = templateToElement(`<${currentRoute.component.name} ${props}></${currentRoute.component.name}>`);
+          currentInstance = currentRoute.component.toInstance(componentElement, parent);
+          currentInstance.appendMount(setupState.element);
+        }
+        watch(changeRoute, router2.currentRoute);
+        changeRoute();
+        return {
+          state: {
+            currentInstance
+          },
+          components: routes.map((route) => route.component).concat([NotFound])
+        };
+      },
+      beforeDestroyed: (state2) => {
+        var _a;
+        (_a = state2.data.currentInstance) == null ? void 0 : _a.value.destroy();
+      }
+    })
+  };
 }
 Object.defineProperty(Object.prototype, "setValueForKey", {
   value: function(value, key) {
@@ -1920,6 +1998,9 @@ function store() {
 function withOptions(options) {
   setAppOptions(options);
 }
+function createRouter(routes, NotFound = void 0) {
+  return router(routes, NotFound);
+}
 var Elaine = {
   setup,
   state,
@@ -1928,6 +2009,7 @@ var Elaine = {
   component,
   eventHub,
   store,
-  withOptions
+  withOptions,
+  createRouter
 };
-export { component, computed, Elaine as default, eventHub, setup, state, store, templateToElement, watch, withOptions };
+export { component, computed, createRouter, Elaine as default, eventHub, setup, state, store, templateToElement, watch, withOptions };

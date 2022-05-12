@@ -4,6 +4,7 @@ import Instance, { Origin } from "./Instance";
 import WatcherLink from "./links/WatcherLink";
 import { ElaineOptions, setAppOptions } from "./Options";
 import { ComponentData, InstanceState, SetupState } from "./PublicTypes";
+import { router, Route, RouterResult } from "./Router";
 import ComputedState from "./states/ComputedState";
 import MutableState from "./states/MutableState";
 import State from "./states/State";
@@ -134,6 +135,10 @@ export function withOptions(options: ElaineOptions) {
     setAppOptions(options);
 }
 
+export function createRouter(routes: Route[], NotFound: Component | undefined = undefined): RouterResult {
+    return router(routes, NotFound);
+}
+
 export default {
     setup,
     state,
@@ -142,5 +147,6 @@ export default {
     component,
     eventHub,
     store,
-    withOptions
+    withOptions,
+    createRouter
 };

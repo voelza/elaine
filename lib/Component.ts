@@ -58,7 +58,7 @@ export default class Component {
         }
     }
 
-    toInstance(element: Element, parent: Instance): Instance {
+    toInstance(element: Element, parent: Instance | undefined = undefined): Instance {
         return new Instance(
             Origin.COMPONENT,
             element,

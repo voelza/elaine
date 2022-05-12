@@ -15,6 +15,7 @@ import RenderLink from "./links/RenderLink";
 import EventHub, { GlobalEventListener } from "./EventHub";
 import Store from "./Store";
 import { dateToDateTimeStr, strDateToDateTimeStr, localeNumber, translate } from "./Functions";
+import { getBindingNameFromKeyPath, getValue } from "./utils/PathHelper";
 
 export enum Origin {
     SETUP,
@@ -148,7 +149,7 @@ export default class Instance {
         return componentElements.includes(tagName);
     }
 
-    private setupIfNeeded(): void {
+    setupIfNeeded(): void {
         if (this.wasCreated) {
             return;
         }
@@ -342,11 +343,18 @@ export default class Instance {
             const propName = prop.name;
             const propAttr = element.getAttribute(propName);
             if (propAttr) {
-                const stateName = propAttr.substring(BINDING.length);
+                const statenNameWithoutBinding = propAttr.substring(BINDING.length);
+                const stateName = getBindingNameFromKeyPath(statenNameWithoutBinding);
                 const state: State<any> | undefined = parent?.getState(stateName);
                 if (state && state instanceof MutableState || state instanceof ImmutableState || state instanceof ComputedState) {
-                    this.states.set(propName, state);
-                    this.internalState.data[propName] = state;
+                    if (statenNameWithoutBinding.indexOf(".") === -1) {
+                        this.states.set(propName, state);
+                        this.internalState.data[propName] = state;
+                    } else {
+                        const subState = new ImmutableState(getValue(statenNameWithoutBinding, state.value));
+                        this.states.set(propName, subState);
+                        this.internalState.data[propName] = subState;
+                    }
                 } else if (propAttr) {
                     // It must be a constants
                     const immutableState = new ImmutableState(this.parseIntoType(prop.type, propAttr));

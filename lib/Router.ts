@@ -1,27 +1,28 @@
 import Component from "./Component";
 import { component, computed, state, templateToElement, watch } from "./Elaine";
-import Instance from "./Instance";
+import Instance, { Origin } from "./Instance";
 import ComputedState from "./states/ComputedState";
 import State from "./states/State";
 
 export type Route = {
     path: string,
-    component: Component
+    component: Component,
+    props?: any
 };
 
 export class Router {
     private routes: Route[];
     private currentPath: State<string>;
-    currentView: ComputedState<Component>;
+    currentRoute: ComputedState<Route>;
 
     constructor(routes: Route[], NotFound: Component) {
         this.routes = routes;
 
         this.currentPath = state(window.location.hash);
 
-        this.currentView = computed(() => {
+        this.currentRoute = computed(() => {
             const path = this.currentPath.value.slice(1) || '/';
-            return this.routes.find(route => route.path === path)?.component || NotFound;
+            return this.routes.find(route => route.path === path) || { path: "/404", component: NotFound };
         }, this.currentPath);
         window.addEventListener('hashchange', () => {
             this.currentPath.value = window.location.hash;
@@ -52,16 +53,31 @@ export function router(routes: Route[], NotFound: Component | undefined = undefi
             name: "router-view",
             template: "<!-- router -->",
             setup: (setupState) => {
+                const parentElement = templateToElement("<span></span>")
+                const parent: Instance = new Instance(Origin.COMPONENT, parentElement, parentElement, undefined, [], [], () => {
+                    const currentRouteProps = computed(() => {
+                        return router.currentRoute.value.props;
+                    }, router.currentRoute);
+                    return {
+                        state: {
+                            currentRouteProps
+                        }
+                    }
+                });
+                parent.setupIfNeeded();
+
                 let currentInstance: Instance | undefined;
                 function changeRoute() {
                     currentInstance?.unmount();
                     currentInstance?.destroy();
 
-                    const currentViewComponent = router.currentView.value;
-                    currentInstance = currentViewComponent.toInstance(templateToElement(`<${currentViewComponent.name}></${currentViewComponent.name}>`));
+                    const currentRoute = router.currentRoute.value;
+                    const props = currentRoute.props ? Object.keys(currentRoute.props).map(k => `${k}="@@currentRouteProps.${k}"`).join(" ") : "";
+                    const componentElement = templateToElement(`<${currentRoute.component.name} ${props}></${currentRoute.component.name}>`);
+                    currentInstance = currentRoute.component.toInstance(componentElement, parent);
                     currentInstance.appendMount(setupState.element as Node as Comment);
                 }
-                watch(changeRoute, router.currentView);
+                watch(changeRoute, router.currentRoute);
 
                 changeRoute();
                 return {
@@ -72,7 +88,7 @@ export function router(routes: Route[], NotFound: Component | undefined = undefi
                 }
             },
             beforeDestroyed: (state) => {
-                state.data.currentInstance?.destroy();
+                state.data.currentInstance?.value.destroy();
             }
         })
     };

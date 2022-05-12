@@ -2,6 +2,7 @@ import { createRouter, setup } from "../../../lib/Elaine";
 import About from "./About";
 import Carousel from "./Carousel";
 import Home from "./Home";
+import NotFound from "./404";
 
 const { router, routerComponent } = createRouter([
     {
@@ -38,7 +39,9 @@ const { router, routerComponent } = createRouter([
             ], yo: "yo"
         }
     }
-]);
+],
+    NotFound
+);
 
 setup(document.getElementById("app")!, {
     state: {

@@ -826,3 +826,82 @@ Elaine.withOptions({
 });
 ```
 The key here is `app.title` will become the string `Yo-Yo-Yo-Minator` when you run `$t(app.title)`. If the key is not in the translation map the key will be displayed.
+
+## Client-Side Routing
+You can enable client-side routing with a hash based history. You simple have to call the `createRouter` function and provide your routes. Routes must be provided as an array with route objects which include a `path` and the `component`associated with it. 
+```typescript
+export type Route = {
+    path: string,
+    component: Component,
+    props?: any
+};
+```
+Additionally you can provide props which will be passed to the component. These will simply be passed down in an object where the key of the field is the property name and the value will be passed down into the component.
+
+The `createRouter` function also gives you the oppotunity to provide a `404 Not Found` component which will appear if the route was not configured. `createRouter` will return the `router` object which handles the routing and the `routerComponent` which you have to use to place the routing-view in your template.
+
+```javascript
+import { createRouter, setup } from "Elaine";
+import About from "./About";
+import ImageWheel from "./ImageWheel";
+import Home from "./Home";
+import NotFound from "./404";
+
+const { router, routerComponent } = createRouter([
+    {
+        path: '/',
+        component: Home,
+        props: {
+            name: "Young Garwain"
+        }
+    },
+    {
+        path: "/about",
+        component: About
+    },
+    {
+        path: "/images",
+        component: ImageWheel,
+        props: {
+            images: [
+                {
+                    src: "pic1.png",
+                    alt: "picture 1",
+                    caption: "This is picture 1"
+                },
+                {
+                    src: "pic2.png",
+                    alt: "picture 2",
+                    caption: "This is picture 2"
+                },
+            ]
+        }
+    }
+],
+NotFound
+);
+
+setup(document.getElementById("app")!, {
+    state: {
+        toHome: () => {
+            router.changeRoute("/")
+        }
+    },
+    components: [routerComponent]
+});
+```
+As you can see we provide our `routes` to `createRouter` and receive the `router` object and our `routerComponent`. Then we can pass the component to our `setup` function as a component and additionally can use our `router` object within our javascript to change the route programmatically. For this the `router` object provides the `changeRoute` method which takes in the new path and changes the rout accordingly.
+
+The only thing left to do is use our `routerComponent` within our template and we are done:
+```html
+<div id="app">
+    <h1>Welcome to my page!</h1>
+    <a href="#/">Home</a> |
+    <a href="#/about">About</a> |
+    <a href="#/images">ImageWheel</a> |
+    <a href="#/non-existent-path">Broken Link</a>
+    <button ++click="toHome">To Home</button>
+    <router-view></router-view>
+</div>
+```
+To change routes you can use normal hyperlinks and refer to each route with a leading `#`.

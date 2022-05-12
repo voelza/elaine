@@ -1,14 +1,8 @@
 import Component from "./Component";
-import Condition from "./Condition";
 import { component, computed, state, templateToElement, watch } from "./Elaine";
-import Instance, { Origin } from "./Instance";
-import DefaultLink from "./links/DefaultLink";
-import StateLink from "./links/StateLink";
+import Instance from "./Instance";
 import ComputedState from "./states/ComputedState";
 import State from "./states/State";
-import { StateBinding } from "./states/StateBinding";
-import { BINDING } from "./Syntax";
-import { insertBefore } from "./utils/DOM";
 
 export type Route = {
     path: string,

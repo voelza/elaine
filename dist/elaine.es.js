@@ -1905,6 +1905,10 @@ function router(routes, NotFound = void 0) {
           components: routes.map((route) => route.component).concat([NotFound])
         };
       },
+      onUnmounted: (state2) => {
+        var _a;
+        (_a = state2.data.currentInstance) == null ? void 0 : _a.value.unmount();
+      },
       beforeDestroyed: (state2) => {
         var _a;
         (_a = state2.data.currentInstance) == null ? void 0 : _a.value.destroy();

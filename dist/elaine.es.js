@@ -1390,7 +1390,7 @@ const SLOT_RESOLVER = "elaine-slot-resolver";
 const SLOT_PARENT_COMPONENT = "elaine-parent-component";
 const componentElements = [];
 class Instance {
-  constructor(origin, element, template, parent = void 0, props = [], slots = [], setup2 = void 0, onMounted = void 0, beforeUnmounted = void 0, onUnmounted = void 0, beforeDestroyed = void 0, onDestroyed = void 0, components = void 0) {
+  constructor(origin, element, template, parent = void 0, props = [], slots = [], setup2 = void 0, components = void 0) {
     __publicField(this, "origin");
     __publicField(this, "element");
     __publicField(this, "parent");
@@ -1424,11 +1424,6 @@ class Instance {
     this.props = props;
     this.slots = slots;
     this.setup = setup2;
-    this.onMounted = onMounted;
-    this.beforeUnmounted = beforeUnmounted;
-    this.onUnmounted = onUnmounted;
-    this.beforeDestroyed = beforeDestroyed;
-    this.onDestroyed = onDestroyed;
     for (const componentFromOutside of components != null ? components : []) {
       this.components.set(componentFromOutside.name, componentFromOutside);
     }
@@ -1688,6 +1683,11 @@ class Instance {
     }
     const setupResult = this.setup(this.internalState);
     if (setupResult) {
+      this.onMounted = setupResult.onMounted;
+      this.beforeUnmounted = setupResult.beforeUnmounted;
+      this.onUnmounted = setupResult.onUnmounted;
+      this.beforeDestroyed = setupResult.beforeDestroyed;
+      this.onDestroyed = setupResult.onDestroyed;
       for (const component2 of setupResult.components || []) {
         this.registerComponent(component2.name, component2);
       }
@@ -1798,28 +1798,18 @@ function invertParentCall(template) {
 }
 const COMPONENT_CSS_SCOPE = "data-elaine-c-";
 class Component {
-  constructor(name, element, props = [], slots = [], setup2 = void 0, onMounted = void 0, beforeUnmounted = void 0, onUnmounted = void 0, beforeDestroyed = void 0, onDestroyed = void 0, css = void 0) {
+  constructor(name, element, props = [], slots = [], setup2 = void 0, css = void 0) {
     __publicField(this, "name");
     __publicField(this, "template");
     __publicField(this, "props", []);
     __publicField(this, "slots", []);
     __publicField(this, "setup");
-    __publicField(this, "onMounted");
-    __publicField(this, "beforeUnmounted");
-    __publicField(this, "onUnmounted");
-    __publicField(this, "beforeDestroyed");
-    __publicField(this, "onDestroyed");
     __publicField(this, "css");
     this.name = name;
     this.template = element.cloneNode(true);
     this.props = props;
     this.slots = slots;
     this.setup = setup2;
-    this.onMounted = onMounted;
-    this.beforeUnmounted = beforeUnmounted;
-    this.onUnmounted = onUnmounted;
-    this.beforeDestroyed = beforeDestroyed;
-    this.onDestroyed = onDestroyed;
     if (css) {
       const componentDataAttribute = COMPONENT_CSS_SCOPE + name.toLowerCase();
       this.css = css.replaceAll(/.*\{/g, (p) => {
@@ -1838,7 +1828,7 @@ class Component {
     }
   }
   toInstance(element, parent = void 0) {
-    return new Instance(Origin.COMPONENT, element, this.template, parent, this.props, this.slots, this.setup, this.onMounted, this.beforeUnmounted, this.onUnmounted, this.beforeDestroyed, this.onDestroyed);
+    return new Instance(Origin.COMPONENT, element, this.template, parent, this.props, this.slots, this.setup);
   }
 }
 class Router {
@@ -1961,7 +1951,7 @@ Object.defineProperty(Object.prototype, "getValueForKeyPath", {
 function setup(element, setupState = void 0) {
   const instance = new Instance(Origin.SETUP, element, element, void 0, [], [], () => {
     return setupState;
-  }, setupState == null ? void 0 : setupState.onMounted, setupState == null ? void 0 : setupState.beforeUnmounted, setupState == null ? void 0 : setupState.onUnmounted, setupState == null ? void 0 : setupState.beforeDestroyed, setupState == null ? void 0 : setupState.onDestroyed, setupState == null ? void 0 : setupState.components);
+  }, setupState == null ? void 0 : setupState.components);
   instance.mount();
   console.log(instance);
   return instance.internalState;
@@ -1991,7 +1981,7 @@ function templateToElement(templateCode) {
 function component(componentData) {
   const name = componentData.name.toUpperCase();
   const element = typeof componentData.template === "string" ? templateToElement(componentData.template) : componentData.template;
-  return new Component(name, element, componentData.props, componentData.slots, componentData.setup, componentData.onMounted, componentData.beforeUnmounted, componentData.onUnmounted, componentData.beforeDestroyed, componentData.onDestroyed, componentData.css);
+  return new Component(name, element, componentData.props, componentData.slots, componentData.setup, componentData.css);
 }
 function eventHub() {
   return EventHub;

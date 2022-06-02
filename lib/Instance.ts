@@ -71,11 +71,6 @@ export default class Instance {
         props: Prop<any>[] = [],
         slots: string[] = [],
         setup: ((state: InstanceState) => SetupState | void) | undefined = undefined,
-        onMounted: ((state: InstanceState) => void) | undefined = undefined,
-        beforeUnmounted: ((state: InstanceState) => void) | undefined = undefined,
-        onUnmounted: ((state: InstanceState) => void) | undefined = undefined,
-        beforeDestroyed: ((state: InstanceState) => void) | undefined = undefined,
-        onDestroyed: ((state: InstanceState) => void) | undefined = undefined,
         components: Component[] | undefined = undefined) {
         this.origin = origin;
         this.element = element;
@@ -84,11 +79,6 @@ export default class Instance {
         this.props = props;
         this.slots = slots;
         this.setup = setup;
-        this.onMounted = onMounted;
-        this.beforeUnmounted = beforeUnmounted;
-        this.onUnmounted = onUnmounted;
-        this.beforeDestroyed = beforeDestroyed;
-        this.onDestroyed = onDestroyed;
 
         for (const componentFromOutside of components ?? []) {
             this.components.set(componentFromOutside.name, componentFromOutside);
@@ -400,6 +390,12 @@ export default class Instance {
 
         const setupResult: SetupState | void = this.setup(this.internalState);
         if (setupResult) {
+            this.onMounted = setupResult.onMounted;
+            this.beforeUnmounted = setupResult.beforeUnmounted;
+            this.onUnmounted = setupResult.onUnmounted;
+            this.beforeDestroyed = setupResult.beforeDestroyed;
+            this.onDestroyed = setupResult.onDestroyed;
+
             for (const component of setupResult.components || []) {
                 this.registerComponent(component.name, component);
             }

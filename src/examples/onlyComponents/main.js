@@ -87,13 +87,12 @@ const modal = ELAINE.component({
             state: {
                 close,
                 backdrop
+            },
+            onMounted: (state) => {
+                const modal = state.element;
+                modal.parentNode?.removeChild(modal);
             }
         };
-    },
-    onMounted: (state) => {
-        const modal = state.element;
-        modal.parentNode?.removeChild(modal);
-
     }
 });
 
@@ -284,12 +283,12 @@ const TheCarousel = ELAINE.component({
                 opacity1,
                 opacity2,
                 interval
+            },
+            onUnmounted: (state) => {
+                console.log("destroy");
+                clearInterval(state.data.interval);
             }
         }
-    },
-    onUnmounted: (state) => {
-        console.log("destroy");
-        clearInterval(state.data.interval);
     }
 });
 

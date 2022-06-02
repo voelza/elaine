@@ -223,11 +223,6 @@ export type ComponentData = {
     props?: Prop<any>[];
     slots?: string[];
     setup?: (state: InstanceState) => SetupState | void;
-    onMounted?: (state: InstanceState) => void;
-    beforeUnmounted?: (state: InstanceState) => void;
-    onUnmounted?: (state: InstanceState) => void;
-    beforeDestroyed?: (state: InstanceState) => void;
-    onDestroyed?: (state: InstanceState) => void;
     css?: string | undefined;
 };
 ```
@@ -266,6 +261,20 @@ Within `$store` you have access to the global store. For more informations see [
 With `dispatchEvent` you can emit DOM events from your top-level template element which can be used to communicate back to the parent component.
 With `dispatchGlobalEvent` you can emit global application events which can be listened on (see [EventHub](#EventHub)).
 With `addGlobalEventListener` add a listener to the global [EventHub](#EventHub).
+
+To register a life cycle hook you have to return the function in the setup function of your component. The resulting setup-state contains all the life-cycle hooks:
+
+```typescript
+export type SetupState = {
+    state?: any | undefined;
+    onMounted?: (state: InstanceState) => void;
+    beforeUnmounted?: (state: InstanceState) => void;
+    onUnmounted?: (state: InstanceState) => void;
+    beforeDestroyed?: (state: InstanceState) => void;
+    onDestroyed?: (state: InstanceState) => void;
+    components?: Component[]
+};
+```
 
 This can be used to build a modal-dialog component like this:
 
@@ -307,12 +316,12 @@ export default Elaine.component({
                 close,
                 open,
                 backdrop
+            }:        
+            onMounted: (state: InstanceState) => {
+                const modal = state.element;
+                modal.parentNode?.removeChild(modal);
             }
         };
-    },
-    onMounted: (state: InstanceState) => {
-        const modal = state.element;
-        modal.parentNode?.removeChild(modal);
     }
 });
 ```
@@ -375,12 +384,12 @@ export default Elaine.component({
                 close,
                 open,
                 backdrop
+            },
+            onMounted: (state: InstanceState) => {
+                const modal = state.element;
+                modal.parentNode?.removeChild(modal);
             }
         };
-    },
-    onMounted: (state: InstanceState) => {
-        const modal = state.element;
-        modal.parentNode?.removeChild(modal);
     }
 });
 ```
@@ -439,12 +448,12 @@ export default Elaine.component({
                 close,
                 open,
                 backdrop
+            },
+            onMounted: (state: InstanceState) => {
+                const modal = state.element;
+                modal.parentNode?.removeChild(modal);
             }
         };
-    },
-    onMounted: (state: InstanceState) => {
-        const modal = state.element;
-        modal.parentNode?.removeChild(modal);
     }
 });
 ```
@@ -602,12 +611,12 @@ export default Elaine.component({
                 close,
                 open,
                 backdrop
+            },
+            onMounted: (state: InstanceState) => {
+                const modal = state.element;
+                modal.parentNode?.removeChild(modal);
             }
         };
-    },
-    onMounted: (state: InstanceState) => {
-        const modal = state.element;
-        modal.parentNode?.removeChild(modal);
     }
 });
 ```

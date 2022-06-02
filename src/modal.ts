@@ -79,13 +79,12 @@ export default Elaine.component({
         return {
             state: {
                 close,
-                open,
-                backdrop
+                open
+            },
+            onMounted: (state: InstanceState) => {
+                const modal = state.element;
+                modal.parentNode?.removeChild(modal);
             }
         };
     },
-    onMounted: (state: InstanceState) => {
-        const modal = state.element;
-        modal.parentNode?.removeChild(modal);
-    }
 });

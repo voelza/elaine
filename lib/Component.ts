@@ -9,11 +9,6 @@ export default class Component {
     private props: Prop<any>[] = [];
     slots: string[] = [];
     private setup: ((state: InstanceState) => SetupState | void) | undefined;
-    private onMounted: ((state: InstanceState) => void) | undefined;
-    private beforeUnmounted: ((state: InstanceState) => void) | undefined;
-    private onUnmounted: ((state: InstanceState) => void) | undefined;
-    private beforeDestroyed: ((state: InstanceState) => void) | undefined;
-    private onDestroyed: ((state: InstanceState) => void) | undefined;
     css: string | undefined;
 
     constructor(
@@ -22,22 +17,12 @@ export default class Component {
         props: Prop<any>[] = [],
         slots: string[] = [],
         setup: ((state: InstanceState) => SetupState | void) | undefined = undefined,
-        onMounted: ((state: InstanceState) => void) | undefined = undefined,
-        beforeUnmounted: ((state: InstanceState) => void) | undefined = undefined,
-        onUnmounted: ((state: InstanceState) => void) | undefined = undefined,
-        beforeDestroyed: ((state: InstanceState) => void) | undefined = undefined,
-        onDestroyed: ((state: InstanceState) => void) | undefined = undefined,
         css: string | undefined = undefined) {
         this.name = name;
         this.template = element.cloneNode(true) as Element;
         this.props = props;
         this.slots = slots;
         this.setup = setup;
-        this.onMounted = onMounted;
-        this.beforeUnmounted = beforeUnmounted;
-        this.onUnmounted = onUnmounted;
-        this.beforeDestroyed = beforeDestroyed;
-        this.onDestroyed = onDestroyed;
 
         if (css) {
             const componentDataAttribute = COMPONENT_CSS_SCOPE + name.toLowerCase();
@@ -67,11 +52,6 @@ export default class Component {
             this.props,
             this.slots,
             this.setup,
-            this.onMounted,
-            this.beforeUnmounted,
-            this.onUnmounted,
-            this.beforeDestroyed,
-            this.onDestroyed
         );
     }
 }

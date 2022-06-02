@@ -67,11 +67,6 @@ export function setup(element: Element, setupState: SetupState | undefined = und
         () => {
             return setupState;
         },
-        setupState?.onMounted,
-        setupState?.beforeUnmounted,
-        setupState?.onUnmounted,
-        setupState?.beforeDestroyed,
-        setupState?.onDestroyed,
         setupState?.components
     );
     instance.mount();
@@ -114,11 +109,6 @@ export function component(componentData: ComponentData): Component {
         componentData.props,
         componentData.slots,
         componentData.setup,
-        componentData.onMounted,
-        componentData.beforeUnmounted,
-        componentData.onUnmounted,
-        componentData.beforeDestroyed,
-        componentData.onDestroyed,
         componentData.css
     );
 }

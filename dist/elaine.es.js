@@ -1378,6 +1378,35 @@ function translate(key) {
   const value = translations.get(key);
   return value != null ? value : key;
 }
+class InertState {
+  constructor(value) {
+    __publicField(this, "value");
+    __publicField(this, "subscribers", []);
+    this.value = value;
+  }
+  set(newValue) {
+    if (this.value !== newValue) {
+      this.value = newValue;
+    }
+  }
+  setPathValue(keyPath, newValue) {
+    this.value.setValueForKeyPath(keyPath, newValue);
+  }
+  subscribe(subscriber) {
+    this.subscribers.push(subscriber);
+  }
+  unsubscribe(subscriber) {
+    const index = this.subscribers.indexOf(subscriber);
+    if (index !== -1) {
+      this.subscribers.splice(index, 1);
+    }
+  }
+  notify() {
+    for (const subscriber of this.subscribers) {
+      subscriber.update();
+    }
+  }
+}
 var Origin = /* @__PURE__ */ ((Origin2) => {
   Origin2[Origin2["SETUP"] = 0] = "SETUP";
   Origin2[Origin2["COMPONENT"] = 1] = "COMPONENT";
@@ -1696,7 +1725,7 @@ class Instance {
         if (state2 instanceof Function) {
           this.methods.set(propName, state2);
           this.internalState.methods[propName] = state2;
-        } else if (state2 instanceof MutableState || state2 instanceof ComputedState || state2 instanceof ImmutableState) {
+        } else if (state2 instanceof MutableState || state2 instanceof ComputedState || state2 instanceof ImmutableState || state2 instanceof InertState) {
           this.states.set(propName, state2);
           this.internalState.data[propName] = state2;
         } else {
@@ -1959,6 +1988,9 @@ function setup(element, setupState = void 0) {
 function state(value) {
   return new MutableState(value);
 }
+function inert(value) {
+  return new InertState(value);
+}
 function watch(watcher, ...states) {
   const watcherLink2 = new WatcherLink(watcher, ...states);
   for (const state2 of states) {
@@ -1998,6 +2030,7 @@ function createRouter(routes, NotFound = void 0) {
 var Elaine = {
   setup,
   state,
+  inert,
   watch,
   computed,
   component,
@@ -2006,4 +2039,4 @@ var Elaine = {
   withOptions,
   createRouter
 };
-export { component, computed, createRouter, Elaine as default, eventHub, setup, state, store, templateToElement, watch, withOptions };
+export { component, computed, createRouter, Elaine as default, eventHub, inert, setup, state, store, templateToElement, watch, withOptions };

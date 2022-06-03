@@ -72,6 +72,8 @@ To declare a immutable state you simply don't use the `state` function and pass 
 const immutableState = "This will never change";
 ```
 
+#### Computed State
+
 To declare a state which depends on other states you can call the `computed` function.
 ```javascript
 const duration = Elaine.state(15 * 1000)
@@ -79,6 +81,8 @@ const elapsed = Elaine.state(0);
 const progress = Elaine.computed(() => elapsed.value / duration.value, elapsed, duration);
 ```
 These states are computed a given function, which you have to provide. You also have to list all the states this computed state depends on. In this example the computed state `progress` is computed by the function `() => elapsed.value / duration.value` and depends on the two states `elapsed` and `duration`.
+
+#### Inert State
 
 Sometimes you may want full control when a state has to updated it's links. For this there is a special state which can be created with the `inert` function. Theses states are inert and will not notify their linked subcribers automatically. That means changes will not automatically trigger the update-link-cycle. To trigger the cycle you have to use the `notify` method on the state.
 

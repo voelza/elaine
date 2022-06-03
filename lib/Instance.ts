@@ -16,6 +16,7 @@ import EventHub, { GlobalEventListener } from "./EventHub";
 import Store from "./Store";
 import { dateToDateTimeStr, strDateToDateTimeStr, localeNumber, translate } from "./Functions";
 import { getBindingNameFromKeyPath, getValue } from "./utils/PathHelper";
+import InertState from "./states/InertState";
 
 export enum Origin {
     SETUP,
@@ -405,7 +406,7 @@ export default class Instance {
                 if (state instanceof Function) {
                     this.methods.set(propName, state);
                     this.internalState.methods[propName] = state;
-                } else if (state instanceof MutableState || state instanceof ComputedState || state instanceof ImmutableState) {
+                } else if (state instanceof MutableState || state instanceof ComputedState || state instanceof ImmutableState || state instanceof InertState) {
                     this.states.set(propName, state);
                     this.internalState.data[propName] = state;
                 } else {

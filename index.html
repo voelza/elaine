@@ -52,6 +52,11 @@
         <todo @@for="todo in @@doneTodos" todo="@@todo" style="color: green;"></todo>
       </div>
     </div>
+    <div>
+      <h1>Inert</h1>
+      <input @@model="inertText" /><button ++click="updateInertState">Update Inert State</button>
+      <div>@@{inertText}</div>
+    </div>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

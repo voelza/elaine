@@ -80,6 +80,19 @@ const progress = Elaine.computed(() => elapsed.value / duration.value, elapsed, 
 ```
 These states are computed a given function, which you have to provide. You also have to list all the states this computed state depends on. In this example the computed state `progress` is computed by the function `() => elapsed.value / duration.value` and depends on the two states `elapsed` and `duration`.
 
+Sometimes you may want full control when a state has to updated it's links. For this there is a special state which can be created with the `inert` function. Theses states are inert and will not notify their linked subcribers automatically. That means changes will not automatically trigger the update-link-cycle. To trigger the cycle you have to use the `notify` method on the state.
+
+```javascript
+const inertText = Elaine.inert("This is a inert state.");
+const updateInertState = () => {
+  inertText.notify();
+}
+```
+```html
+<input @@model="inertText" /><button ++click="updateInertState">Update Inert State</button>
+<div>@@{inertText}</div> <!-- This will not automatically update -->
+```
+
 ### Template Syntax
 To link states to DOM elements you have to use a special syntax within your DOM template. 
 To link text content of text nodes you have to use the following syntax:

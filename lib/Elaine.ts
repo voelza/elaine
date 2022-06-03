@@ -6,6 +6,7 @@ import { ElaineOptions, setAppOptions } from "./Options";
 import { ComponentData, InstanceState, SetupState } from "./PublicTypes";
 import { router, Route, RouterResult } from "./Router";
 import ComputedState from "./states/ComputedState";
+import InertState from "./states/InertState";
 import MutableState from "./states/MutableState";
 import State from "./states/State";
 import Store, { StoreInstance } from "./Store";
@@ -78,6 +79,10 @@ export function state<T>(value: T): State<T> {
     return new MutableState(value);
 }
 
+export function inert<T>(value: T): State<T> {
+    return new InertState(value);
+}
+
 export function watch(watcher: () => void, ...states: State<any>[]): void {
     const watcherLink: WatcherLink = new WatcherLink(watcher, ...states);
     for (const state of states) {
@@ -132,6 +137,7 @@ export function createRouter(routes: Route[], NotFound: Component | undefined = 
 export default {
     setup,
     state,
+    inert,
     watch,
     computed,
     component,

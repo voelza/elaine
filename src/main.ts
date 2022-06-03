@@ -125,6 +125,11 @@ const undone = (todo: any) => {
   todo.done = false;
 }
 
+const inertText = Elaine.inert("This is a inert state.");
+const updateInertState = () => {
+  inertText.notify();
+}
+
 const instance = Elaine.setup(app, {
   state: {
     myState,
@@ -138,7 +143,9 @@ const instance = Elaine.setup(app, {
     openModal,
     addTodoNotPossible,
     done,
-    undone
+    undone,
+    inertText,
+    updateInertState
   },
   components: [
     todo, yo, modal

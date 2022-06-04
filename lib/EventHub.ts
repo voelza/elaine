@@ -5,9 +5,9 @@ export type GlobalEventListener = {
 
 export class EventHubInstance {
 
-    private listeners: Map<string, ((payload: any) => void)[]> = new Map();
+    private listeners: Map<string, ((payload: any | undefined) => void)[]> = new Map();
 
-    dispatchEvent(eventName: string, payload: any) {
+    dispatchEvent(eventName: string, payload: any | undefined) {
         for (const listener of this.listeners.get(eventName) ?? []) {
             listener(payload);
         }

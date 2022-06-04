@@ -36,7 +36,7 @@ export type InstanceState = {
     refs: any,
     $store: StoreInstance,
     dispatchEvent: (eventName: string, payload: any | undefined) => void,
-    dispatchGlobalEvent: (eventName: string, payload: any) => void,
+    dispatchGlobalEvent: (eventName: string, payload: any | undefined) => void,
     addGlobalEventListener: (eventName: string, listener: (payload: any) => void) => void
 };
 

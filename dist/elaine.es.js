@@ -1668,7 +1668,7 @@ class Instance {
         const statenNameWithoutBinding = propAttr.substring(BINDING.length);
         const stateName = getBindingNameFromKeyPath(statenNameWithoutBinding);
         const state2 = parent == null ? void 0 : parent.getState(stateName);
-        if (state2 && state2 instanceof MutableState || state2 instanceof ImmutableState || state2 instanceof ComputedState) {
+        if (state2 && state2 instanceof MutableState || state2 instanceof ImmutableState || state2 instanceof ComputedState || state2 instanceof InertState) {
           if (statenNameWithoutBinding.indexOf(".") === -1) {
             this.states.set(propName, state2);
             this.internalState.data[propName] = state2;
@@ -1677,8 +1677,9 @@ class Instance {
             this.states.set(propName, subState);
             this.internalState.data[propName] = subState;
           }
-        } else {
-          const method = this.methods.get(stateName);
+        } else if (stateName.indexOf("(") !== -1) {
+          const methodName = stateName.substring(0, stateName.indexOf("("));
+          const method = parent.methods.get(methodName);
           if (method) {
             const eventListener = createEventListener(parent, void 0, "", statenNameWithoutBinding);
             const eventListenerBindings = [];
@@ -1694,11 +1695,13 @@ class Instance {
               state22.subscribe(computed2);
             }
             parent.addLink(computed2);
-          } else if (propAttr) {
-            const immutableState = new ImmutableState(this.parseIntoType(prop.type, propAttr));
-            this.states.set(propName, immutableState);
-            this.internalState.data[propName] = state2;
+            this.states.set(propName, computed2);
+            this.internalState.data[propName] = computed2;
           }
+        } else if (propAttr) {
+          const immutableState = new ImmutableState(this.parseIntoType(prop.type, propAttr));
+          this.states.set(propName, immutableState);
+          this.internalState.data[propName] = state2;
         }
         element.removeAttribute(propName);
       } else {

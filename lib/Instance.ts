@@ -93,7 +93,7 @@ export default class Instance {
             });
             this.template.dispatchEvent(event);
         }
-        this.dispatchGlobalEvent = (eventName: string, payload: any): void => {
+        this.dispatchGlobalEvent = (eventName: string, payload: any | undefined): void => {
             EventHub.dispatchEvent(eventName, payload);
         };
         this.addGlobalEventListener = (eventName: string, listener: (payload: any) => void) => {

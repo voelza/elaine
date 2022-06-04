@@ -1677,10 +1677,28 @@ class Instance {
             this.states.set(propName, subState);
             this.internalState.data[propName] = subState;
           }
-        } else if (propAttr) {
-          const immutableState = new ImmutableState(this.parseIntoType(prop.type, propAttr));
-          this.states.set(propName, immutableState);
-          this.internalState.data[propName] = state2;
+        } else {
+          const method = this.methods.get(stateName);
+          if (method) {
+            const eventListener = createEventListener(parent, void 0, "", statenNameWithoutBinding);
+            const eventListenerBindings = [];
+            for (const b of eventListener.bindings) {
+              if (b.state) {
+                eventListenerBindings.push(b.state);
+              }
+            }
+            const computed2 = new ComputedState(() => {
+              return eventListener.listener(void 0);
+            }, eventListenerBindings);
+            for (const state22 of eventListenerBindings) {
+              state22.subscribe(computed2);
+            }
+            parent.addLink(computed2);
+          } else if (propAttr) {
+            const immutableState = new ImmutableState(this.parseIntoType(prop.type, propAttr));
+            this.states.set(propName, immutableState);
+            this.internalState.data[propName] = state2;
+          }
         }
         element.removeAttribute(propName);
       } else {

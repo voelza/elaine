@@ -17,6 +17,8 @@ import Store from "./Store";
 import { dateToDateTimeStr, strDateToDateTimeStr, localeNumber, translate } from "./Functions";
 import { getBindingNameFromKeyPath, getValue } from "./utils/PathHelper";
 import InertState from "./states/InertState";
+import EventListenerLink from "./links/EventListenerLink";
+import { createEventListener } from "./links/EventListenerLinker";
 
 export enum Origin {
     SETUP,
@@ -190,7 +192,6 @@ export default class Instance {
     }
 
     private gatherAllComponents(): Component[] {
-        // return [...this.components.values(), ...this.childInstances.map(i => i.gatherAllComponents()).flatMap(c => Array.from(c))];
         const components: Component[] = [];
         for (const c of this.components.values()) {
             for (const cc of c.gatherAllComponents()) {
@@ -345,7 +346,7 @@ export default class Instance {
                 const statenNameWithoutBinding = propAttr.substring(BINDING.length);
                 const stateName = getBindingNameFromKeyPath(statenNameWithoutBinding);
                 const state: State<any> | undefined = parent?.getState(stateName);
-                if (state && state instanceof MutableState || state instanceof ImmutableState || state instanceof ComputedState) {
+                if (state && state instanceof MutableState || state instanceof ImmutableState || state instanceof ComputedState || state instanceof InertState) {
                     if (statenNameWithoutBinding.indexOf(".") === -1) {
                         this.states.set(propName, state);
                         this.internalState.data[propName] = state;
@@ -353,6 +354,28 @@ export default class Instance {
                         const subState = new ImmutableState(getValue(statenNameWithoutBinding, state.value));
                         this.states.set(propName, subState);
                         this.internalState.data[propName] = subState;
+                    }
+                } else if (stateName.indexOf("(") !== -1) {
+                    const methodName = stateName.substring(0, stateName.indexOf("("));
+                    const method = parent!.methods.get(methodName);
+                    if (method) {
+                        const eventListener: EventListenerLink | undefined = createEventListener(parent!, undefined, "", statenNameWithoutBinding);
+                        const eventListenerBindings: State<any>[] = [];
+                        for (const b of eventListener!.bindings) {
+                            if (b.state) {
+                                eventListenerBindings.push(b.state);
+                            }
+                        }
+
+                        const computed = new ComputedState(() => {
+                            return eventListener!.listener(undefined);
+                        }, eventListenerBindings);
+                        for (const state of eventListenerBindings) {
+                            state.subscribe(computed);
+                        }
+                        parent!.addLink(computed);
+                        this.states.set(propName, computed);
+                        this.internalState.data[propName] = computed;
                     }
                 } else if (propAttr) {
                     // It must be a constants

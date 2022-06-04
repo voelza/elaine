@@ -130,6 +130,17 @@ const updateInertState = () => {
   inertText.notify();
 }
 
+const justReturn = (something: any) => "!!" + something;
+
+const thing = component({
+  name: "thing",
+  props: [{
+    name: "prop",
+    type: String
+  }],
+  template: "<h3>@@{prop}</h3>"
+})
+
 const instance = setup(app, {
   state: {
     myState,
@@ -145,9 +156,11 @@ const instance = setup(app, {
     done,
     undone,
     inertText,
-    updateInertState
+    updateInertState,
+    justReturn
   },
   components: [
-    todo, yo, modal
+    todo, yo, modal,
+    thing
   ]
 });

@@ -58,6 +58,8 @@
       <input @@model="inertText" /><button ++click="updateInertState">Update Inert State</button>
       <div>@@{inertText}</div>
     </div>
+    <thing prop="@@justReturn(@@inertText)"></thing>
+    <thing prop="@@inertText"></thing>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

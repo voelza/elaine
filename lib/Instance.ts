@@ -87,13 +87,13 @@ export default class Instance {
             this.components.set(componentFromOutside.name, componentFromOutside);
         }
 
-        this.dispatchEvent = (eventName: string, payload: any): void => {
+        this.dispatchEvent = (eventName: string, payload: any | undefined = undefined): void => {
             const event = new CustomEvent(eventName, {
                 detail: payload
             });
             this.template.dispatchEvent(event);
         }
-        this.dispatchGlobalEvent = (eventName: string, payload: any | undefined): void => {
+        this.dispatchGlobalEvent = (eventName: string, payload: any | undefined = undefined): void => {
             EventHub.dispatchEvent(eventName, payload);
         };
         this.addGlobalEventListener = (eventName: string, listener: (payload: any) => void) => {

@@ -1,4 +1,4 @@
-import Elaine from "./Elaine";
+import { watch } from "./Elaine";
 import StateLink from "./links/StateLink";
 import ComputedState from "./states/ComputedState";
 import ImmutableState from "./states/ImmutableState";
@@ -35,7 +35,7 @@ export class StoreInstance {
         // @ts-ignore: Unreachable code error
         const state: State<any> | undefined = this["_" + property];
         if (state) {
-            Elaine.watch(() => {
+            watch(() => {
                 watcher(state.value);
             }, state);
         }

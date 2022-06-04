@@ -1,8 +1,7 @@
-import Elaine from "../../../lib/Elaine";
-import ELAINE from "../../../lib/Elaine";
+import { component, computed, state, setup } from "../../../lib/Elaine";
 import State from "../../../lib/states/State";
 
-const table = ELAINE.component({
+const table = component({
     name: "myTable",
     template: `
     <table>
@@ -112,13 +111,13 @@ const table = ELAINE.component({
         }
     ],
     slots: ["mycolumn"],
-    setup: (state) => {
-        const headers = state.data.headers;
+    setup: (setupState) => {
+        const headers = setupState.data.headers;
         headers.value.forEach((element: any) => {
             element.sortStatus = "none";
         });
 
-        let sortHeader: State<any | null> = Elaine.state(null);
+        let sortHeader: State<any | null> = state(null);
         const sortItems = (header: any) => {
             if (header.sortStatus === "none") {
                 header.sortStatus = "asc";
@@ -140,8 +139,8 @@ const table = ELAINE.component({
             headers.notify();
         };
 
-        const items = state.data.items;
-        const rows = ELAINE.computed(() => {
+        const items = setupState.data.items;
+        const rows = computed(() => {
             const i = Array.from(items.value);
             if (sortHeader.value !== null) {
                 i.sort((a: any, b: any) => {
@@ -203,7 +202,7 @@ type Item = {
     random: string
 }
 
-const content: State<Item[]> = ELAINE.state([]);
+const content: State<Item[]> = state([]);
 for (let i = 1; i <= 400; i++) {
     content.value.push(
         {
@@ -218,7 +217,7 @@ for (let i = 1; i <= 400; i++) {
     );
 }
 
-const newRow = ELAINE.state({
+const newRow = state({
     name: "",
     age: 1,
     birthdate: ""
@@ -241,7 +240,7 @@ const addNewRow = () => {
 }
 
 
-const headers = ELAINE.state([
+const headers = state([
     {
         label: "My Cool Name",
         key: "name",
@@ -281,7 +280,7 @@ const showData = (data: any, data2: any) => {
 }
 
 
-ELAINE.setup(document.getElementById("app")!, {
+setup(document.getElementById("app")!, {
     state: {
         content,
         headers,

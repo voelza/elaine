@@ -1,7 +1,7 @@
-import Elaine from "../lib/Elaine";
+import { component } from "../lib/Elaine";
 import { InstanceState } from "../lib/PublicTypes";
 
-export default Elaine.component({
+export default component({
     name: "modal",
     template: `
     <div class="modal">

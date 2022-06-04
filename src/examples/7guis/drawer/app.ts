@@ -1,12 +1,12 @@
-import Elaine from "../../../../lib/Elaine";
+import { computed, state, setup } from "../../../../lib/Elaine";
 import State from "../../../../lib/states/State";
 
 
-const history: State<any> = Elaine.state([[]])
-const index: State<any> = Elaine.state(0)
-const circles: State<any> = Elaine.state([])
-const selected: State<any> = Elaine.state(null)
-const adjusting: State<any> = Elaine.state(false)
+const history: State<any> = state([[]])
+const index: State<any> = state(0)
+const circles: State<any> = state([])
+const selected: State<any> = state(null)
+const adjusting: State<any> = state(false)
 
 // @ts-ignore: Unreachable code error
 function onClick({ clientX: x, clientY: y }) {
@@ -61,9 +61,9 @@ function setSelected(circle: any) {
     selected.value = circle;
 }
 
-const isAtFirstIndex = Elaine.computed(() => index.value <= 0, index);
-const isAtLastIndex = Elaine.computed(() => index.value >= history.value.length - 1, history, index);
-Elaine.setup(document.getElementById("app")!,
+const isAtFirstIndex = computed(() => index.value <= 0, index);
+const isAtLastIndex = computed(() => index.value >= history.value.length - 1, history, index);
+setup(document.getElementById("app")!,
     {
         state: {
             setSelected,

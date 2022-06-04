@@ -1,4 +1,4 @@
-import Elaine from "../../../../lib/Elaine";
+import { setup } from "../../../../lib/Elaine";
 import cell from "./cell";
 import { cells } from "./store";
 
@@ -8,7 +8,7 @@ for (let i = 0; i < cells.value[0].length; i++) {
     colsLengthAsArray.push(i);
 }
 
-Elaine.setup(document.getElementById("app")!, {
+setup(document.getElementById("app")!, {
     state: {
         cols,
         colsLengthAsArray,

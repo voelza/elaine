@@ -1,6 +1,6 @@
-import Elaine from "../../../lib/Elaine";
+import { component, setup, state, getStore, withOptions } from "../../../lib/Elaine";
 
-const componentWithin = Elaine.component({
+const componentWithin = component({
     name: "test",
     template: `
     <div>
@@ -9,7 +9,7 @@ const componentWithin = Elaine.component({
     `
 });
 
-const component = Elaine.component({
+const comp = component({
     name: "test",
     template: `
     <div>
@@ -18,13 +18,13 @@ const component = Elaine.component({
         <test @@style="font-size: @@$store.constant##px;"></test>
     </div>
     `,
-    setup: (state) => {
+    setup: (setupState) => {
         const count = () => {
             // @ts-ignore
-            state.$store.counter++;
+            setupState.$store.counter++;
         }
 
-        state.$store.watch("counterDoubled", (c) => {
+        setupState.$store.watch("counterDoubled", (c) => {
             console.log("counterDoubled", c);
         });
 
@@ -38,17 +38,17 @@ const component = Elaine.component({
 });
 
 
-const store = Elaine.store();
-const counter = Elaine.state(0);
-const counterDoubled = Elaine.state(0);
+const storeObj = getStore();
+const counter = state(0);
+const counterDoubled = state(0);
 const constant = 20;
-store.add({ counter, counterDoubled, constant });
-store.watch("counter", (c) => {
+storeObj.add({ counter, counterDoubled, constant });
+storeObj.watch("counter", (c) => {
     counterDoubled.value = c * 2;
 });
 
 
-Elaine.withOptions({
+withOptions({
     dateFormats: [
         {
             name: "shortLong",
@@ -79,11 +79,11 @@ Elaine.withOptions({
 
 const date = new Date();
 const dateStr = '2022-04-08T20:00:00';
-Elaine.setup(document.getElementById("app")!, {
+setup(document.getElementById("app")!, {
     state: {
         date,
         dateStr
     },
-    components: [component]
+    components: [comp]
 }
 );

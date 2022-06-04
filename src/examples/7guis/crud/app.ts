@@ -1,13 +1,13 @@
-import Elaine from "../../../../lib/Elaine";
+import { computed, state, watch, setup } from "../../../../lib/Elaine";
 
 
-const names = Elaine.state(['Emil, Hans', 'Mustermann, Max', 'Tisch, Roman'])
-const selected = Elaine.state('')
-const prefix = Elaine.state('')
-const first = Elaine.state('')
-const last = Elaine.state('')
+const names = state(['Emil, Hans', 'Mustermann, Max', 'Tisch, Roman'])
+const selected = state('')
+const prefix = state('')
+const first = state('')
+const last = state('')
 
-const filteredNames = Elaine.computed(() =>
+const filteredNames = computed(() =>
     names.value.filter((n) =>
         n.toLowerCase().startsWith(prefix.value.toLowerCase())
     ),
@@ -15,7 +15,7 @@ const filteredNames = Elaine.computed(() =>
     prefix
 )
 
-Elaine.watch(() => {
+watch(() => {
     [last.value, first.value] = selected.value.split(', ')
 }, selected)
 
@@ -51,7 +51,7 @@ function hasValidInput() {
     return first.value.trim() && last.value.trim()
 }
 
-Elaine.setup(document.getElementById("app")!, {
+setup(document.getElementById("app")!, {
     state: {
         filteredNames,
         selected,

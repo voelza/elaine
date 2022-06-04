@@ -1,11 +1,11 @@
-import Elaine from "../../../../lib/Elaine";
-const flightType = Elaine.state('one-way flight')
-const departureDate = Elaine.state(dateToString(new Date()))
-const returnDate = Elaine.state(departureDate.value)
+import { computed, setup, state } from "../../../../lib/Elaine";
+const flightType = state('one-way flight')
+const departureDate = state(dateToString(new Date()))
+const returnDate = state(departureDate.value)
 
-const isReturn = Elaine.computed(() => flightType.value === 'return flight', flightType);
+const isReturn = computed(() => flightType.value === 'return flight', flightType);
 
-const canBook = Elaine.computed(
+const canBook = computed(
     () =>
         !isReturn.value ||
         stringToDate(returnDate.value) > stringToDate(departureDate.value),
@@ -41,7 +41,7 @@ function pad(n: any, s = String(n)) {
 }
 
 
-Elaine.setup(document.getElementById("app")!, {
+setup(document.getElementById("app")!, {
     state: {
         flightType,
         departureDate,

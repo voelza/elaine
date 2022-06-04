@@ -36,9 +36,9 @@ export default class Instance {
     private element: Element;
     parent: Instance | undefined = undefined;
     private template: Element;
-    private states: Map<string, State<any>> = new Map();
-    private methods: Map<string, Function> = new Map();
-    components: Map<string, Component> = new Map();
+    private states: Map<string, State<any>> = new Map<string, State<any>>();
+    private methods: Map<string, Function> = new Map<string, Function>();
+    components: Map<string, Component> = new Map<string, Component>();
     private links: StateLink[] = [];
     private childInstances: Instance[] = [];
 
@@ -190,7 +190,15 @@ export default class Instance {
     }
 
     private gatherAllComponents(): Component[] {
-        return [...this.components.values(), ...this.childInstances.map(i => i.components.values()).flatMap(c => Array.from(c))];
+        // return [...this.components.values(), ...this.childInstances.map(i => i.gatherAllComponents()).flatMap(c => Array.from(c))];
+        const components: Component[] = [];
+        for (const c of this.components.values()) {
+            for (const cc of c.gatherAllComponents()) {
+                components.push(cc);
+            }
+        }
+
+        return components;
     }
 
     addLink(link: StateLink): void {
@@ -396,10 +404,6 @@ export default class Instance {
             this.onUnmounted = setupResult.onUnmounted;
             this.beforeDestroyed = setupResult.beforeDestroyed;
             this.onDestroyed = setupResult.onDestroyed;
-
-            for (const component of setupResult.components || []) {
-                this.registerComponent(component.name, component);
-            }
 
             for (const propName in setupResult.state ?? {}) {
                 const state = setupResult.state[propName];

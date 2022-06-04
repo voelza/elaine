@@ -1,11 +1,12 @@
 {
   "name": "elaine",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "files": [
     "dist"
   ],
-  "main": "./dist/elaine.umd.js",
-  "module": "./dist/elaine.es.js",
+  "main": "./dist/elaine.umd",
+  "module": "./dist/elaine.es",
+  "types": "./dist/Elaine.d.ts",
   "exports": {
     ".": {
       "import": "./dist/elaine.es.js",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "typescript": "^4.5.4",
-    "vite": "^2.8.0"
+    "vite": "^2.8.0",
+    "vite-plugin-dts": "^1.2.0"
   }
 }

@@ -1,9 +1,9 @@
-import Elaine from "../../../../lib/Elaine"
+import { state } from "../../../../lib/Elaine"
 
 const COLS = 5
 const ROWS = 20
 
-export const cells = Elaine.state(
+export const cells = state(
     Array.from(Array(COLS).keys()).map(() =>
         Array.from(Array(ROWS).keys()).map(() => '')
     )

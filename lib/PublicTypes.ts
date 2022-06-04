@@ -8,7 +8,10 @@ export type SetupState = {
     onUnmounted?: (state: InstanceState) => void;
     beforeDestroyed?: (state: InstanceState) => void;
     onDestroyed?: (state: InstanceState) => void;
-    components?: Component[]
+};
+
+export interface ElaineSetup extends SetupState {
+    components?: Component[];
 };
 
 export type ComponentData = {
@@ -23,6 +26,7 @@ export type ComponentData = {
     beforeDestroyed?: (state: InstanceState) => void;
     onDestroyed?: (state: InstanceState) => void;
     css?: string | undefined;
+    components?: Component[];
 };
 
 export type InstanceState = {

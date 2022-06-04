@@ -1,9 +1,9 @@
-import ELAINE from "../../../lib/Elaine.ts";
+import { state, watch, component, setup } from "../../../lib/Elaine.ts";
 
-const fetchPokemonData = (state) => {
-    const pokemon = state.data.pokemon;
-    const loading = ELAINE.state(false);
-    const pokemonData = ELAINE.state(null);
+const fetchPokemonData = (stupState) => {
+    const pokemon = stupState.data.pokemon;
+    const loading = state(false);
+    const pokemonData = state(null);
     const fetchPokemonData = () => {
         if (!pokemon.value || !pokemon.value.url) {
             pokemonData.value = null;
@@ -16,17 +16,17 @@ const fetchPokemonData = (state) => {
             .finally(() => loading.value = false);
     };
 
-    console.log("added watcher", state.data.pokemon);
-    ELAINE.watch(() => {
+    console.log("added watcher", stupState.data.pokemon);
+    watch(() => {
         console.log("pokemon changed... gonna fetch");
         fetchPokemonData();
-    }, state.data.pokemon);
+    }, stupState.data.pokemon);
 
     fetchPokemonData();
 
     const selectedPokemon = () => {
         console.log("pokemon-selected")
-        state.dispatchEvent("pokemon-selected", pokemon.value);
+        stupState.dispatchEvent("pokemon-selected", pokemon.value);
     };
     return {
         state: {
@@ -37,7 +37,7 @@ const fetchPokemonData = (state) => {
     };
 };
 
-const pokemon = ELAINE.component({
+const pokemon = component({
     name: "pokemon",
     template: `
     <div class="pokemon">
@@ -68,7 +68,7 @@ const pokemon = ELAINE.component({
     const pokemonsResponse = await response.json();
     const pokemons = pokemonsResponse.results;
 
-    const detailPokemon = ELAINE.state(null);
+    const detailPokemon = state(null);
     const selectPokemon = (pokemon) => {
         console.log("pokemon select", pokemon);
         detailPokemon.value = pokemon;
@@ -80,7 +80,7 @@ const pokemon = ELAINE.component({
         selectPokemon(event.detail);
     };
 
-    ELAINE.setup(document.getElementById("app"), {
+    setup(document.getElementById("app"), {
         state: {
             pokemons,
             fetchPokemonData,

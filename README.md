@@ -5,7 +5,7 @@ The frontend framework without a virtual DOM. This is not recommended for produc
 ## How to use
 You can simple use the umd build like this:
 ```html
-<script src="https://cdn.jsdelivr.net/gh/voelza/elaine@v0.2.1/dist/elaine.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/voelza/elaine@v0.3.0/dist/elaine.umd.js"></script>
 ```
 
 NPM version is not available at the moment and is also not planned.
@@ -289,7 +289,6 @@ export type SetupState = {
     onUnmounted?: (state: InstanceState) => void;
     beforeDestroyed?: (state: InstanceState) => void;
     onDestroyed?: (state: InstanceState) => void;
-    components?: Component[]
 };
 ```
 
@@ -767,10 +766,10 @@ There is a global store which will be the same in every component. Within a temp
 @@{$store.counter}
 ```
 
-To fill it with values you can call the `store` function which will give you the global store. Then you can add states to it by using the `add` method. You pass it by wrapping your states in an object and they will be available within the template with the same name like this: `$store.stateName`. Additionally you can use the store's `watch` method to watch a state on the store. For safety reasons the watcher callback will only get the `.value` of the state to avoid endless update-watch loops.
+To fill it with values you can call the `getStore` function which will give you the global store. Then you can add states to it by using the `add` method. You pass it by wrapping your states in an object and they will be available within the template with the same name like this: `$store.stateName`. Additionally you can use the store's `watch` method to watch a state on the store. For safety reasons the watcher callback will only get the `.value` of the state to avoid endless update-watch loops.
 
 ```javascript
-const store = Elaine.store();
+const store = Elaine.getStore();
 const counter = Elaine.state(0);
 const counterDoubled = Elaine.state(0);
 const constant = 10;
@@ -794,10 +793,10 @@ setup: (state) => {
     return {
         state: {
             count
-        },
-        components: [componentWithin]
+        }
     }
-}
+},
+components: [componentWithin]
 ```
 
 ## Build-in Functions

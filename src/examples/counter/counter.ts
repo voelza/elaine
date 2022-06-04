@@ -1,6 +1,6 @@
-import Elaine from "../../../lib/Elaine";
+import { component, setup, state } from "../../../lib/Elaine";
 
-const counterComponent = Elaine.component({
+const counterComponent = component({
     name: "counter",
     template: `
         <div class="counter">
@@ -9,7 +9,7 @@ const counterComponent = Elaine.component({
         </div>
     `,
     setup: () => {
-        const counter = Elaine.state(0);
+        const counter = state(0);
         const increaseCounter = () => {
             counter.value++;
         };
@@ -23,7 +23,7 @@ const counterComponent = Elaine.component({
 });
 
 
-Elaine.setup(document.getElementById("app")!,
+setup(document.getElementById("app")!,
     {
         state: {},
         components: [counterComponent]

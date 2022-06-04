@@ -1219,7 +1219,7 @@ class StoreInstance {
   watch(property, watcher) {
     const state2 = this["_" + property];
     if (state2) {
-      Elaine.watch(() => {
+      watch(() => {
         watcher(state2.value);
       }, state2);
     }
@@ -1538,7 +1538,13 @@ class Instance {
     this.wasCreated = true;
   }
   gatherAllComponents() {
-    return [...this.components.values(), ...this.childInstances.map((i) => i.components.values()).flatMap((c) => Array.from(c))];
+    const components = [];
+    for (const c of this.components.values()) {
+      for (const cc of c.gatherAllComponents()) {
+        components.push(cc);
+      }
+    }
+    return components;
   }
   addLink(link2) {
     this.links.push(link2);
@@ -1717,9 +1723,6 @@ class Instance {
       this.onUnmounted = setupResult.onUnmounted;
       this.beforeDestroyed = setupResult.beforeDestroyed;
       this.onDestroyed = setupResult.onDestroyed;
-      for (const component2 of setupResult.components || []) {
-        this.registerComponent(component2.name, component2);
-      }
       for (const propName in (_a = setupResult.state) != null ? _a : {}) {
         const state2 = setupResult.state[propName];
         if (state2 instanceof Function) {
@@ -1827,18 +1830,20 @@ function invertParentCall(template) {
 }
 const COMPONENT_CSS_SCOPE = "data-elaine-c-";
 class Component {
-  constructor(name, element, props = [], slots = [], setup2 = void 0, css = void 0) {
+  constructor(name, element, props = [], slots = [], setup2 = void 0, css = void 0, components) {
     __publicField(this, "name");
     __publicField(this, "template");
     __publicField(this, "props", []);
     __publicField(this, "slots", []);
     __publicField(this, "setup");
     __publicField(this, "css");
+    __publicField(this, "components");
     this.name = name;
     this.template = element.cloneNode(true);
     this.props = props;
     this.slots = slots;
     this.setup = setup2;
+    this.components = components;
     if (css) {
       const componentDataAttribute = COMPONENT_CSS_SCOPE + name.toLowerCase();
       this.css = css.replaceAll(/.*\{/g, (p) => {
@@ -1856,8 +1861,20 @@ class Component {
       }
     }
   }
+  gatherAllComponents() {
+    if (!this.components) {
+      return [this];
+    }
+    const components = [this];
+    for (const c of this.components) {
+      for (const cc of c.gatherAllComponents()) {
+        components.push(cc);
+      }
+    }
+    return components;
+  }
   toInstance(element, parent = void 0) {
-    return new Instance(Origin.COMPONENT, element, this.template, parent, this.props, this.slots, this.setup);
+    return new Instance(Origin.COMPONENT, element, this.template, parent, this.props, this.slots, this.setup, this.components);
   }
 }
 class Router {
@@ -1918,20 +1935,15 @@ function router(routes, NotFound = void 0) {
         watch(changeRoute, router2.currentRoute);
         changeRoute();
         return {
-          state: {
-            currentInstance
+          onUnmounted: () => {
+            currentInstance == null ? void 0 : currentInstance.unmount();
           },
-          components: routes.map((route) => route.component).concat([NotFound])
+          beforeDestroyed: () => {
+            currentInstance == null ? void 0 : currentInstance.destroy();
+          }
         };
       },
-      onUnmounted: (state2) => {
-        var _a;
-        (_a = state2.data.currentInstance) == null ? void 0 : _a.value.unmount();
-      },
-      beforeDestroyed: (state2) => {
-        var _a;
-        (_a = state2.data.currentInstance) == null ? void 0 : _a.value.destroy();
-      }
+      components: routes.map((route) => route.component).concat([NotFound])
     })
   };
 }
@@ -1977,10 +1989,10 @@ Object.defineProperty(Object.prototype, "getValueForKeyPath", {
     }
   }
 });
-function setup(element, setupState = void 0) {
+function setup(element, elaineSetup = void 0) {
   const instance = new Instance(Origin.SETUP, element, element, void 0, [], [], () => {
-    return setupState;
-  }, setupState == null ? void 0 : setupState.components);
+    return elaineSetup;
+  }, elaineSetup == null ? void 0 : elaineSetup.components);
   instance.mount();
   console.log(instance);
   return instance.internalState;
@@ -2013,12 +2025,12 @@ function templateToElement(templateCode) {
 function component(componentData) {
   const name = componentData.name.toUpperCase();
   const element = typeof componentData.template === "string" ? templateToElement(componentData.template) : componentData.template;
-  return new Component(name, element, componentData.props, componentData.slots, componentData.setup, componentData.css);
+  return new Component(name, element, componentData.props, componentData.slots, componentData.setup, componentData.css, componentData.components);
 }
 function eventHub() {
   return EventHub;
 }
-function store() {
+function getStore() {
   return Store.value;
 }
 function withOptions(options) {
@@ -2027,16 +2039,4 @@ function withOptions(options) {
 function createRouter(routes, NotFound = void 0) {
   return router(routes, NotFound);
 }
-var Elaine = {
-  setup,
-  state,
-  inert,
-  watch,
-  computed,
-  component,
-  eventHub,
-  store,
-  withOptions,
-  createRouter
-};
-export { component, computed, createRouter, Elaine as default, eventHub, inert, setup, state, store, templateToElement, watch, withOptions };
+export { component, computed, createRouter, eventHub, getStore, inert, setup, state, templateToElement, watch, withOptions };

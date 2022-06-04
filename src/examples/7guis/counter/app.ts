@@ -1,12 +1,12 @@
-import Elaine from "../../../../lib/Elaine";
+import { state, setup } from "../../../../lib/Elaine";
 
 
-const counter = Elaine.state(0);
+const counter = state(0);
 const increaseCounter = () => {
     counter.value++;
 };
 
-Elaine.setup(document.getElementById("app")!, {
+setup(document.getElementById("app")!, {
     state: {
         counter, increaseCounter
     }

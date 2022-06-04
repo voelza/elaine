@@ -184,13 +184,12 @@ export default component({
                 image1,
                 image2,
                 opacity1,
-                opacity2,
-                interval
+                opacity2
+            },
+            onUnmounted: () => {
+                console.log("destroy");
+                clearInterval(interval);
             }
         }
-    },
-    onUnmounted: (state) => {
-        console.log("destroy");
-        clearInterval(state.data.interval);
     }
 });

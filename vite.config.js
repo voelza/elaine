@@ -1,10 +1,11 @@
-const path = require('path')
-const { defineConfig } = require('vite')
+import { resolve } from 'path';
+import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
 module.exports = defineConfig({
     build: {
         lib: {
-            entry: path.resolve(__dirname, 'lib/Elaine.ts'),
+            entry: resolve(__dirname, 'lib/Elaine.ts'),
             name: 'ELAINE',
             fileName: (format) => `elaine.${format}.js`
         },
@@ -17,5 +18,6 @@ module.exports = defineConfig({
                 }
             }
         }
-    }
+    },
+    plugins: [dts()]
 })

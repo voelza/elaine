@@ -12,13 +12,12 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "noEmit": true,
   },
   "include": [
-    "./src",
     "./lib"
-  ]
+  ],
 }

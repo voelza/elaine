@@ -1,15 +1,15 @@
 import './style.css'
-import Elaine from '../lib/Elaine';
+import { component, computed, inert, setup, state } from '../lib/Elaine';
 import modal from './modal';
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
-const myState = Elaine.state({
+const myState = state({
   text: "Yo",
   visible: true
 });
 
-const todos = Elaine.state([
+const todos = state([
   {
     title: "Aufgabe #1",
     content: "Es wird gut werden.",
@@ -27,7 +27,7 @@ const todos = Elaine.state([
   }
 ]);
 
-const todo = Elaine.component({
+const todo = component({
   name: "todo",
   props: [{
     name: "todo",
@@ -76,7 +76,7 @@ const todo = Elaine.component({
   }
 });
 
-const yo = Elaine.component({
+const yo = component({
   name: "yo",
   template: `
   <div>yoy oy yo</div>
@@ -93,11 +93,11 @@ const alertMyState = () => {
   window.alert(JSON.stringify(myState.value));
 };
 
-const openTodos = Elaine.computed(() => todos.value.filter(t => !t.done), todos);
-const doneTodos = Elaine.computed(() => todos.value.filter(t => t.done), todos);
+const openTodos = computed(() => todos.value.filter(t => !t.done), todos);
+const doneTodos = computed(() => todos.value.filter(t => t.done), todos);
 
-const todoTitle = Elaine.state("");
-const todoContent = Elaine.state("");
+const todoTitle = state("");
+const todoContent = state("");
 
 const addTodo = () => {
   todos.value.push({
@@ -114,7 +114,7 @@ const openModal = () => {
   instance.refs.modal.methods.open();
 };
 
-const addTodoNotPossible = Elaine.computed(() => !todoTitle.value || !todoContent.value, todoTitle, todoContent);
+const addTodoNotPossible = computed(() => !todoTitle.value || !todoContent.value, todoTitle, todoContent);
 
 
 const done = (todo: any) => {
@@ -125,12 +125,12 @@ const undone = (todo: any) => {
   todo.done = false;
 }
 
-const inertText = Elaine.inert("This is a inert state.");
+const inertText = inert("This is a inert state.");
 const updateInertState = () => {
   inertText.notify();
 }
 
-const instance = Elaine.setup(app, {
+const instance = setup(app, {
   state: {
     myState,
     todos,

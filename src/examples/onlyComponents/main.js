@@ -1,6 +1,6 @@
-import ELAINE from "../../../lib/Elaine";
+import { component, state, setup } from "../../../lib/Elaine";
 
-const modal = ELAINE.component({
+const modal = component({
     name: "modal",
     template: `
     <div class="modal">
@@ -61,8 +61,8 @@ const modal = ELAINE.component({
         }
     ],
     slots: ["content", "header"],
-    setup: (state) => {
-        const modal = state.element;
+    setup: (stupState) => {
+        const modal = stupState.element;
         modal.setAttribute("style", "position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000;");
 
         const backdrop = document.createElement("div");
@@ -79,7 +79,7 @@ const modal = ELAINE.component({
             document.body.appendChild(modal);
         };
 
-        state.addGlobalEventListener(`openmodal${state.data.modalid.value}`, open);
+        stupState.addGlobalEventListener(`openmodal${stupState.data.modalid.value}`, open);
 
         backdrop.addEventListener("click", close);
 
@@ -88,8 +88,8 @@ const modal = ELAINE.component({
                 close,
                 backdrop
             },
-            onMounted: (state) => {
-                const modal = state.element;
+            onMounted: (mountState) => {
+                const modal = mountState.element;
                 modal.parentNode?.removeChild(modal);
             }
         };
@@ -97,7 +97,7 @@ const modal = ELAINE.component({
 });
 
 
-const TheCarousel = ELAINE.component({
+const TheCarousel = component({
     name: "TheCarousel",
     template: `
     <div class="carousal">
@@ -202,12 +202,12 @@ const TheCarousel = ELAINE.component({
             type: Array
         }
     ],
-    setup: (state) => {
+    setup: (setupState) => {
         const getPreviousIndex = (index) => {
             let i = index;
             i--;
             if (i < 0) {
-                i = state.data.images.value.length - 1;
+                i = setupState.data.images.value.length - 1;
             }
             return i;
         }
@@ -215,19 +215,19 @@ const TheCarousel = ELAINE.component({
         const getNextIndex = (index) => {
             let i = index;
             i++;
-            if (i === state.data.images.value.length) {
+            if (i === setupState.data.images.value.length) {
                 i = 0;
             }
             return i;
         }
 
         let currentIndex = 0;
-        const selectedImage = ELAINE.state(state.data.images.value[currentIndex]);
+        const selectedImage = state(setupState.data.images.value[currentIndex]);
 
-        const image1 = ELAINE.state(selectedImage.value);
-        const opacity1 = ELAINE.state(0);
-        const image2 = ELAINE.state(state.data.images.value[getNextIndex(currentIndex)]);
-        const opacity2 = ELAINE.state(0);
+        const image1 = state(selectedImage.value);
+        const opacity1 = state(0);
+        const image2 = state(setupState.data.images.value[getNextIndex(currentIndex)]);
+        const opacity2 = state(0);
 
         const swapImages = (imgFromBefore) => {
             if (image1.value === imgFromBefore) {
@@ -248,7 +248,7 @@ const TheCarousel = ELAINE.component({
             const imgFromBefore = selectedImage.value;
 
             currentIndex = getPreviousIndex(currentIndex);
-            selectedImage.value = state.data.images.value[currentIndex];
+            selectedImage.value = setupState.data.images.value[currentIndex];
 
             swapImages(imgFromBefore);
         };
@@ -257,7 +257,7 @@ const TheCarousel = ELAINE.component({
             const imgFromBefore = selectedImage.value;
 
             currentIndex = getNextIndex(currentIndex);
-            selectedImage.value = state.data.images.value[currentIndex];
+            selectedImage.value = setupState.data.images.value[currentIndex];
 
             swapImages(imgFromBefore);
         };
@@ -281,18 +281,17 @@ const TheCarousel = ELAINE.component({
                 image1,
                 image2,
                 opacity1,
-                opacity2,
-                interval
+                opacity2
             },
-            onUnmounted: (state) => {
+            onUnmounted: () => {
                 console.log("destroy");
-                clearInterval(state.data.interval);
+                clearInterval(interval);
             }
         }
     }
 });
 
-const app = ELAINE.component({
+const app = component({
     name: "app",
     template: `
     <div>
@@ -327,16 +326,16 @@ const app = ELAINE.component({
             align-items: center;
         }
     `,
-    setup: (state) => {
+    setup: (setupState) => {
 
         const modalid = "carouselModal";
         const openModal = () => {
-            state.dispatchGlobalEvent(`openmodal${modalid}`);
+            setupState.dispatchGlobalEvent(`openmodal${modalid}`);
         };
 
         const modalid2 = "modalid2";
         const openDifferentModal = () => {
-            state.dispatchGlobalEvent(`openmodal${modalid2}`);
+            setupState.dispatchGlobalEvent(`openmodal${modalid2}`);
         };
 
         const images = [
@@ -379,14 +378,14 @@ const app = ELAINE.component({
                 modalid,
                 modalid2,
                 openDifferentModal
-            },
-            components: [modal, TheCarousel]
+            }
         }
-    }
+    },
+    components: [modal, TheCarousel]
 });
 
 
-ELAINE.setup(document.getElementById("app"), {
+setup(document.getElementById("app"), {
     state: {},
     components: [app]
 });

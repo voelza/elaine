@@ -3,7 +3,7 @@ import EventHub, { EventHubInstance } from "./EventHub";
 import Instance, { Origin } from "./Instance";
 import WatcherLink from "./links/WatcherLink";
 import { ElaineOptions, setAppOptions } from "./Options";
-import { ComponentData, InstanceState, SetupState } from "./PublicTypes";
+import { ComponentData, ElaineSetup, InstanceState, SetupState } from "./PublicTypes";
 import { router, Route, RouterResult } from "./Router";
 import ComputedState from "./states/ComputedState";
 import InertState from "./states/InertState";
@@ -57,7 +57,7 @@ Object.defineProperty(Object.prototype, "getValueForKeyPath", {
 });
 
 
-export function setup(element: Element, setupState: SetupState | undefined = undefined): InstanceState {
+export function setup(element: Element, elaineSetup: ElaineSetup | undefined = undefined): InstanceState {
     const instance = new Instance(
         Origin.SETUP,
         element,
@@ -66,9 +66,9 @@ export function setup(element: Element, setupState: SetupState | undefined = und
         [],
         [],
         () => {
-            return setupState;
+            return elaineSetup as SetupState;
         },
-        setupState?.components
+        elaineSetup?.components
     );
     instance.mount();
     console.log(instance);
@@ -114,7 +114,8 @@ export function component(componentData: ComponentData): Component {
         componentData.props,
         componentData.slots,
         componentData.setup,
-        componentData.css
+        componentData.css,
+        componentData.components
     );
 }
 
@@ -122,7 +123,7 @@ export function eventHub(): EventHubInstance {
     return EventHub;
 }
 
-export function store(): StoreInstance {
+export function getStore(): StoreInstance {
     return Store.value;
 }
 
@@ -133,16 +134,3 @@ export function withOptions(options: ElaineOptions) {
 export function createRouter(routes: Route[], NotFound: Component | undefined = undefined): RouterResult {
     return router(routes, NotFound);
 }
-
-export default {
-    setup,
-    state,
-    inert,
-    watch,
-    computed,
-    component,
-    eventHub,
-    store,
-    withOptions,
-    createRouter
-};

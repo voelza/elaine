@@ -1,7 +1,7 @@
-import Elaine from "../../../../lib/Elaine";
+import { component, state } from "../../../../lib/Elaine";
 import { cells, evalCell } from "./store";
 
-export default Elaine.component({
+export default component({
     name: "cell",
     template: `
     <div class="cell" @@title="@@getCell(@@c,@@r)" ++click="setEditing">
@@ -24,8 +24,8 @@ export default Elaine.component({
             type: "Number"
         }
     ],
-    setup: (state) => {
-        const editing = Elaine.state(false);
+    setup: (setupState) => {
+        const editing = state(false);
 
         function setEditing() {
             editing.value = true;
@@ -33,7 +33,7 @@ export default Elaine.component({
 
         function update(e: any) {
             editing.value = false
-            cells.value[state.data.c.value][state.data.r.value] = e.target.value.trim()
+            cells.value[setupState.data.c.value][setupState.data.r.value] = e.target.value.trim()
             cells.notify();
         }
 

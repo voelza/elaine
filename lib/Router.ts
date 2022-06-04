@@ -81,18 +81,15 @@ export function router(routes: Route[], NotFound: Component | undefined = undefi
 
                 changeRoute();
                 return {
-                    state: {
-                        currentInstance
+                    onUnmounted: () => {
+                        currentInstance?.unmount();
                     },
-                    components: routes.map(route => route.component).concat([NotFound!])
+                    beforeDestroyed: () => {
+                        currentInstance?.destroy();
+                    },
                 }
             },
-            onUnmounted: (state) => {
-                state.data.currentInstance?.value.unmount();
-            },
-            beforeDestroyed: (state) => {
-                state.data.currentInstance?.value.destroy();
-            }
+            components: routes.map(route => route.component).concat([NotFound!])
         })
     };
 }

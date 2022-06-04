@@ -96,7 +96,7 @@ export default class Instance {
         this.dispatchGlobalEvent = (eventName: string, payload: any | undefined = undefined): void => {
             EventHub.dispatchEvent(eventName, payload);
         };
-        this.addGlobalEventListener = (eventName: string, listener: (payload: any) => void) => {
+        this.addGlobalEventListener = (eventName: string, listener: (payload?: any | undefined) => void) => {
             const globalEventListener: GlobalEventListener = { eventName, listener };
             EventHub.addListener(globalEventListener);
             this.globalEventListeners.push(globalEventListener);

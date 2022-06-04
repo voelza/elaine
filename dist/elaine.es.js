@@ -1456,13 +1456,13 @@ class Instance {
     for (const componentFromOutside of components != null ? components : []) {
       this.components.set(componentFromOutside.name, componentFromOutside);
     }
-    this.dispatchEvent = (eventName, payload) => {
+    this.dispatchEvent = (eventName, payload = void 0) => {
       const event = new CustomEvent(eventName, {
         detail: payload
       });
       this.template.dispatchEvent(event);
     };
-    this.dispatchGlobalEvent = (eventName, payload) => {
+    this.dispatchGlobalEvent = (eventName, payload = void 0) => {
       EventHub.dispatchEvent(eventName, payload);
     };
     this.addGlobalEventListener = (eventName, listener) => {

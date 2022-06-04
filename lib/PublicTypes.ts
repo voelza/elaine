@@ -35,9 +35,9 @@ export type InstanceState = {
     methods: any,
     refs: any,
     $store: StoreInstance,
-    dispatchEvent: (eventName: string, payload: any | undefined) => void,
-    dispatchGlobalEvent: (eventName: string, payload: any | undefined) => void,
-    addGlobalEventListener: (eventName: string, listener: (payload: any) => void) => void
+    dispatchEvent: (eventName: string, payload?: any | undefined) => void,
+    dispatchGlobalEvent: (eventName: string, payload?: any | undefined) => void,
+    addGlobalEventListener: (eventName: string, listener: (payload?: any | undefined) => void) => void
 };
 
 export interface ComputedState<T> {

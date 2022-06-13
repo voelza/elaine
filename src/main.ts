@@ -138,7 +138,26 @@ const thing = component({
     name: "prop",
     type: String
   }],
-  template: "<h3>@@{prop}</h3>"
+  template: `<h3 @@for="i in @@a" @@class="{@@isSomething(@@yes,@@yes) : nice}" class="hm">@@{prop}<button ++click="toggleYes">Yes/No</button></h3>`,
+  css: `
+  .hm {
+    color: blue;
+  }
+  .nice {
+    color: green;
+  }
+  `,
+  setup: () => {
+    const yes = state(false);
+    return {
+      state: {
+        yes,
+        isSomething: (thing: any, thing2: any): boolean => thing == true && thing2 == true,
+        toggleYes: () => yes.value = !yes.value,
+        a: [1, 2, 3, 4]
+      }
+    }
+  }
 })
 
 const instance = setup(app, {

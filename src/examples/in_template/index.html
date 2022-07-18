@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>In Template</title>
+</head>
+
+<body>
+    <style>        
+        .todos {
+            text-align: center;
+        }
+
+        .todo-header {
+        flex-direction: column;
+        }
+
+        .all-todos {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        }
+
+        .todo-bubble {
+        padding: 5px;
+        background-color: aliceblue;
+        border-radius: 5px;
+        }
+    </style>
+    <template id="app-template">
+       <div class="todos">
+            <h1>TODOs</h1>
+            <div class="all-todos">
+                <div @@for="todo in @@todos" class="todo-bubble">
+                (@@{_index})
+                @@{todo.title}
+                <span ++click="{@@todo.done : undone(@@todo); !@@todo.done : done(@@todo)}">
+                    @@{{@@todo.done : ❌;!@@todo.done:✅}}
+                </span>
+                </div>
+            </div>
+            <button ++click="openModal">Add Todo</button>
+      
+            <modal ref="modal" title="Add a new tab!">
+                <content>
+                <h2>@@{~title}</h2>
+                <input @@model="@@todoTitle" type="text" placeholder="ToDo title" />
+                <textarea @@model="@@todoContent" placeholder="ToDo content" rows="5"></textarea>
+                <button ++click="addTodo" @@disabled="@@addTodoNotPossible">Add Todo</button>
+                </content>
+            </modal>
+            <div style="display: flex; flex-direction: row; gap: 15px; justify-content: center;">
+                <div>
+                <todo @@for="todo in @@openTodos" todo="@@todo"></todo>
+                </div>
+                <div>
+                <todo @@for="todo in @@doneTodos" todo="@@todo" style="color: green;"></todo>
+                </div>
+            </div>
+       </div>
+    </template>
+    <div id="app"></div>
+    <script src="./in-template.ts" type="module"></script>
+</body>
+
+</html>

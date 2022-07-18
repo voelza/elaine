@@ -75,6 +75,24 @@ export function setup(element: Element, elaineSetup: ElaineSetup | undefined = u
     return instance.internalState;
 };
 
+export function setupWithTemplate(element: Element, templateElement: HTMLTemplateElement, elaineSetup: ElaineSetup | undefined = undefined): InstanceState {
+    const instance = new Instance(
+        Origin.SETUP,
+        element,
+        Array.from(templateElement.content.children).find(c => !(c instanceof Text)) as Element,
+        undefined,
+        [],
+        [],
+        () => {
+            return elaineSetup as SetupState;
+        },
+        elaineSetup?.components
+    );
+    instance.mount();
+    console.log(instance);
+    return instance.internalState;
+};
+
 export function state<T>(value: T): State<T> {
     return new MutableState(value);
 }

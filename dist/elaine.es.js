@@ -2018,6 +2018,14 @@ function setup(element, elaineSetup = void 0) {
   console.log(instance);
   return instance.internalState;
 }
+function setupWithTemplate(element, templateElement, elaineSetup = void 0) {
+  const instance = new Instance(Origin.SETUP, element, Array.from(templateElement.content.children).find((c) => !(c instanceof Text)), void 0, [], [], () => {
+    return elaineSetup;
+  }, elaineSetup == null ? void 0 : elaineSetup.components);
+  instance.mount();
+  console.log(instance);
+  return instance.internalState;
+}
 function state(value) {
   return new MutableState(value);
 }
@@ -2060,4 +2068,4 @@ function withOptions(options) {
 function createRouter(routes, NotFound = void 0) {
   return router(routes, NotFound);
 }
-export { component, computed, createRouter, eventHub, getStore, inert, setup, state, templateToElement, watch, withOptions };
+export { component, computed, createRouter, eventHub, getStore, inert, setup, setupWithTemplate, state, templateToElement, watch, withOptions };
